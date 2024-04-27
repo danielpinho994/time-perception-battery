@@ -1,0 +1,164 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+ }
+ body {
+  background-color: #faf3e0; /* Soft beige background */
+  color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  padding-top: 3rem; /* Add some top padding instead of margin on the child div */
+  min-height: 100vh; /* Minimum height */
+  overflow-x: hidden; /* Hide horizontal scrollbar if not necessary */
+ }
+ body > div {
+  width: 90%;
+  max-width: 960px; /* Adjust to your preference for max width */
+ }
+ input, button, textarea {
+  font-family: inherit;
+ }
+ h1.title {
+  color: #333;
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 2.5rem;
+ }
+ h2.subtitle {
+  background-color: #444;
+  color: #faf3e0;
+  padding: 0.75rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  font-size: 1.75rem;
+ }
+ .level {
+  margin-bottom: 5rem;
+ }
+ button {
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 20px; /* More rounded corners */
+  margin: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  display: block; /* Make buttons take the full width */
+  width: 100%;
+  max-width: 300px; /* Max width for buttons */
+  margin: 1rem auto; /* Center buttons */
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+ }
+ button:hover {
+  opacity: 0.85;
+  transform: translateY(-3px); /* Button lift effect */
+ }
+ button:disabled {
+  background-color: #ccc;
+  color: #a49d9df0;
+  box-shadow: none;
+  cursor: not-allowed;
+ }
+ .btn-start-stop {
+  background-color: #78909c; /* Greyish blue - more subtle than the bright blue */
+  color: white;
+ }
+ .btn-save, .btn-reset {
+  background-color: #a1887f; /* Muted brown, close to beige tones */
+  color: white;
+ }
+ .btn-change, .btn-submit {
+  background-color: #ffab91; /* Soft peach */
+  color: #212529;
+  width: 50%;
+ }
+ .btn-pdf {
+  background-color: #bcaaa4; /* Lighter brown tone */
+  color: white;
+ }
+ .name-input {
+  width: calc(100% - 20px); /* 100% width less the total horizontal padding */
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+ }
+ .table-results {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem auto; /* Center tables in the div */
+ }
+ .table-results td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  text-align: center;
+ }
+ .modal {
+  position: fixed; /* Make sure modal is in a fixed position */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+  z-index: 1000; /* Higher z-index to overlay on top of other content */
+  max-width: 500px; /* Adjust based on your content */
+  width: 90%; /* Responsive width */
+ }
+ .result {
+  padding: 0.75rem;
+  border-radius: 10px;
+  background-color: #ffecb3; /* Light yellow background for results */
+  margin: 1rem 0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  display: block; /* Make sure it is a block-level element */
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+  flex-basis: 40%;
+ }
+ .results-container {
+  display: flex;  /* This will make the container a flex container */
+  justify-content: space-around; /* This will space the child elements nicely */
+ }
+ .result-row {
+  padding: 0.75rem;
+  border-radius: 10px;
+  background-color: #ffecb3; /* Light yellow background for results */
+  margin: 1rem 0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  text-align: center;
+ }
+ .footer-buttons {
+  margin: 1rem 0;
+ }
+ @media print {
+  .print-scale, .print-scale * {
+    visibility: visible; /* Make sure all printable content is visible */
+    margin: 0 !important;
+    padding: 0 !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
+   }
+   .print-scale {
+    position: absolute;
+    transform-origin: top;
+    transform: scale(0.5); /* The scale you choose should be the one that fits the content on one page */
+    width: 100% !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
+   }
+   button, .timer {
+    display: none !important;
+  }
+}
