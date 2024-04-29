@@ -1,45 +1,16 @@
-/* eslint-disable no-plusplus */
 import { useState, useEffect, useRef, FormEvent } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import beepFile from '../../../assets/beep.wav';
 import Timer from './Timer';
+import { useProductionResults, useProductionSequences } from './AppContext';
 
-function ProductionTest() {
-  // --- PERSISTANT CONTEXT --- //
+export default function ProductionTest() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [estimationSequences] = useState<number[]>(
-    location.state.estimationSequences,
-  );
-  const [estimationResults] = useState<number[]>(
-    location.state.estimationResults,
-  );
-  const [productionSequences] = useState<number[]>(
-    location.state.productionSequences,
-  );
-  const [productionResults, setResults] = useState<number[]>(
-    location.state.productionResults,
-  );
-  const [clockResults] = useState<[number, number]>(
-    location.state.clockResults,
-  );
-  const [globalStartTime] = useState<number>(location.state.globalStartTime);
-  const [globalResults] = useState<[number, number]>(
-    location.state.globalResults,
-  );
+  const [productionSequences] = useProductionSequences();
+  const [productionResults, setResults] = useProductionResults();
 
   const goToMainMenu = () => {
-    navigate('/', {
-      state: {
-        estimationSequences,
-        estimationResults,
-        productionSequences,
-        productionResults,
-        clockResults,
-        globalStartTime,
-        globalResults,
-      },
-    });
+    navigate('/');
   };
 
   const [isReady, setIsReady] = useState(true);
@@ -53,16 +24,15 @@ function ProductionTest() {
   const [canStart, setCanStart] = useState(true);
   const beepSound = useRef<HTMLAudioElement>(new Audio(beepFile));
 
+  // set interval title
   useEffect(() => {
     const nextInterval = productionResults.length + 1;
 
-    // check limit 9 intervals
     if (nextInterval === 10) {
       setCanStart(false);
       return;
     }
 
-    // change interval title
     const nextIntervalTime = productionSequences[nextInterval - 1] / 1000;
     if (isTrialInterval)
       setIntervalTitle('Intervalo de Experimentação: 4 segundos');
@@ -72,21 +42,19 @@ function ProductionTest() {
       );
   }, [productionResults, productionSequences, isTrialInterval]);
 
+  // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     if (!isPaused) {
-      // start stop watch
       const startTime = performance.now();
       interval = setInterval(() => {
         setTime(performance.now() - startTime);
       }, 1000);
     } else {
-      // stop stop watch
       clearInterval(interval);
     }
 
     return () => {
-      // Clearing interval on unmount or if paused
       clearInterval(interval);
     };
   }, [isPaused]);
@@ -105,11 +73,10 @@ function ProductionTest() {
   const handleSave = () => {
     setTime(0);
     if (isTrialInterval) setIsTrialInterval(false);
-    else
-      setResults((prevResults) => [
-        ...prevResults,
-        Math.floor((time / 1000) % 60),
-      ]);
+    else {
+      const newResults = [...productionResults, Math.floor((time / 1000) % 60)];
+      setResults(newResults);
+    }
     setIsReady(true);
   };
 
@@ -117,7 +84,7 @@ function ProductionTest() {
     <button
       type="button"
       className="btn btn-one btn-start"
-      onMouseDown={handleStartStop}
+      onClick={handleStartStop}
       disabled={!canStart || isEditable}
     >
       {isPaused ? 'Começar' : 'Parar'}
@@ -129,7 +96,7 @@ function ProductionTest() {
       <button
         type="button"
         className="btn btn-one"
-        onMouseDown={handleSave}
+        onClick={handleSave}
         disabled={isEditable}
       >
         {isTrialInterval ? 'Próximo intervalo' : 'Guardar intervalo'}
@@ -137,7 +104,7 @@ function ProductionTest() {
       <button
         type="button"
         className="btn btn-two"
-        onMouseDown={handleReset}
+        onClick={handleReset}
         disabled={isEditable}
       >
         Repetir intervalo
@@ -166,7 +133,7 @@ function ProductionTest() {
     setEditable(!isEditable);
   };
 
-  const onResultChange = (
+  const onEditable = (
     index: number,
     event: FormEvent<HTMLTableCellElement>,
   ) => {
@@ -197,7 +164,7 @@ function ProductionTest() {
           <td
             key={`result-${index + 1}`}
             contentEditable={isEditable}
-            onInput={(e) => onResultChange(index, e)}
+            onInput={(e) => onEditable(index, e)}
           >
             {result}
           </td>
@@ -209,7 +176,7 @@ function ProductionTest() {
               isEditable &&
               index + productionResults.length === productionResults.length
             }
-            onInput={(e) => onResultChange(index + productionResults.length, e)}
+            onInput={(e) => onEditable(index + productionResults.length, e)}
           />
         ))}
       </tr>
@@ -228,7 +195,7 @@ function ProductionTest() {
 
       <button
         type="button"
-        onMouseDown={goToMainMenu}
+        onClick={goToMainMenu}
         disabled={!isPaused || isEditable || !isReady}
       >
         Voltar
@@ -236,7 +203,7 @@ function ProductionTest() {
 
       <button
         type="button"
-        onMouseDown={toggleEditable}
+        onClick={toggleEditable}
         disabled={!isPaused || !isReady}
       >
         {isEditable ? 'Guardar Tabela' : 'Ativar Edição'}
@@ -244,5 +211,3 @@ function ProductionTest() {
     </div>
   );
 }
-
-export default ProductionTest;

@@ -7,7 +7,7 @@ import {
   useProductionSequences,
   useProductionResults,
   useClockResults,
-  useIsWaitingInput,
+  useModalOpen,
 } from './AppContext';
 import GlobalTest from './GlobalTest';
 
@@ -18,7 +18,7 @@ export default function MainMenu() {
   const [productionSequences] = useProductionSequences();
   const [productionResults] = useProductionResults();
   const [clockResults] = useClockResults();
-  const [isWaitingInput] = useIsWaitingInput();
+  const [modalOpen] = useModalOpen();
 
   const goToTest = (testRoute: string) => {
     navigate(testRoute);
@@ -34,7 +34,7 @@ export default function MainMenu() {
         type="text"
         value={patientName}
         onChange={(e) => setPatientName(e.target.value)}
-        disabled={isWaitingInput}
+        disabled={modalOpen}
       />
     </div>
   );
@@ -45,8 +45,8 @@ export default function MainMenu() {
       <button
         className="go-to-test"
         type="button"
-        onMouseDown={() => goToTest('/estimation-test')}
-        disabled={isWaitingInput}
+        onClick={() => goToTest('/estimation-test')}
+        disabled={modalOpen}
       >
         Ir para teste
       </button>
@@ -82,8 +82,8 @@ export default function MainMenu() {
       <button
         type="button"
         className="go-to-test"
-        onMouseDown={() => goToTest('/production-test')}
-        disabled={isWaitingInput}
+        onClick={() => goToTest('/production-test')}
+        disabled={modalOpen}
       >
         Ir para teste
       </button>
@@ -119,8 +119,8 @@ export default function MainMenu() {
       <button
         type="button"
         className="go-to-test"
-        onMouseDown={() => goToTest('/clock-test')}
-        disabled={isWaitingInput}
+        onClick={() => goToTest('/clock-test')}
+        disabled={modalOpen}
       >
         Ir para teste
       </button>
@@ -151,10 +151,10 @@ export default function MainMenu() {
       <button
         type="button"
         className="btn-footer"
-        onMouseDown={useReactToPrint({
+        onClick={useReactToPrint({
           content: () => componentRef.current,
         })}
-        disabled={isWaitingInput}
+        disabled={modalOpen}
       >
         Gerar PDF
       </button>
@@ -162,7 +162,7 @@ export default function MainMenu() {
         type="button"
         className="btn-footer"
         onClick={() => console.log('reset')} ////////////////////////////////////////////////////////
-        disabled={isWaitingInput}
+        disabled={modalOpen}
       >
         Gerar novo teste
       </button>

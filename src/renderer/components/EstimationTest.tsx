@@ -5,7 +5,7 @@ import { useEstimationSequences, useEstimationResults } from './AppContext';
 import beepFile from '../../../assets/beep.wav';
 import Timer from './Timer';
 
-function EstimationTest() {
+export default function EstimationTest() {
   const navigate = useNavigate();
   const [estimationSequences] = useEstimationSequences();
   const [estimationResults, setResults] = useEstimationResults();
@@ -25,28 +25,14 @@ function EstimationTest() {
   const [canStart, setCanStart] = useState(true);
   const beepSound = useRef<HTMLAudioElement>(new Audio(beepFile));
 
-  const [isWaitingInput, setWaitingInput] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [userInput, setUserInput] = useState<number | null>(null);
 
   const requestUserInput = async () => {
-    setWaitingInput(true);
     setModalOpen(true);
   };
 
-  useEffect(() => {
-    if (!modalOpen) {
-      if (userInput !== null) {
-        const newResults = [...estimationResults, userInput];
-        setResults(newResults);
-        setUserInput(null);
-      }
-      setWaitingInput(false);
-      setIsReady(true);
-      setTime(0);
-    }
-  }, [modalOpen, userInput, setResults, estimationResults]);
-
+  // set interval title
   useEffect(() => {
     const nextInterval = estimationResults.length + 1;
 
@@ -64,11 +50,11 @@ function EstimationTest() {
       );
   }, [estimationResults, estimationSequences, isTrialInterval]);
 
+  // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
     if (!isPaused) {
-      // start stop watch
       const startTime = performance.now();
       interval = setInterval(() => {
         setTime(() => {
@@ -120,8 +106,8 @@ function EstimationTest() {
     <button
       type="button"
       className="btn-start-stop"
-      onMouseDown={handleStartStop}
-      disabled={!canStart || isWaitingInput || isEditable}
+      onClick={handleStartStop}
+      disabled={!canStart || modalOpen || isEditable}
     >
       {isPaused ? 'Começar' : 'Parar'}
     </button>
@@ -133,7 +119,7 @@ function EstimationTest() {
         <button
           type="button"
           className="btn btn-two"
-          onMouseDown={handleFirstInterval}
+          onClick={handleFirstInterval}
           disabled={isEditable}
         >
           Próximo intervalo
@@ -142,8 +128,8 @@ function EstimationTest() {
       <button
         type="button"
         className="btn btn-two"
-        onMouseDown={handleReset}
-        disabled={isWaitingInput || isEditable}
+        onClick={handleReset}
+        disabled={modalOpen || isEditable}
       >
         Repetir Intervalo
       </button>
@@ -171,7 +157,7 @@ function EstimationTest() {
     setEditable(!isEditable);
   };
 
-  const onEditResult = (
+  const onEditable = (
     index: number,
     event: FormEvent<HTMLTableCellElement>,
   ) => {
@@ -202,7 +188,7 @@ function EstimationTest() {
           <td
             key={`result-${index + 1}`}
             contentEditable={isEditable}
-            onInput={(e) => onEditResult(index, e)}
+            onInput={(e) => onEditable(index, e)}
           >
             {result}
           </td>
@@ -214,7 +200,7 @@ function EstimationTest() {
               isEditable &&
               index + estimationResults.length === estimationResults.length
             }
-            onInput={(e) => onEditResult(index + estimationResults.length, e)}
+            onInput={(e) => onEditable(index + estimationResults.length, e)}
           />
         ))}
       </tr>
@@ -237,9 +223,14 @@ function EstimationTest() {
             />
             <button
               type="button"
-              onMouseDown={() => {
+              onClick={() => {
                 if (userInput !== null) {
                   setModalOpen(false);
+                  const newResults = [...estimationResults, userInput];
+                  setResults(newResults);
+                  setUserInput(null);
+                  setIsReady(true);
+                  setTime(0);
                 }
               }}
             >
@@ -248,7 +239,12 @@ function EstimationTest() {
             <button
               type="button"
               className="btn-submit"
-              onMouseDown={() => setModalOpen(false)}
+              onClick={() => {
+                setModalOpen(false);
+                setUserInput(null);
+                setIsReady(true);
+                setTime(0);
+              }}
             >
               Cancelar
             </button>
@@ -263,21 +259,19 @@ function EstimationTest() {
 
       <button
         type="button"
-        onMouseDown={goToMainMenu}
-        disabled={!isPaused || isEditable || isWaitingInput || !isReady}
+        onClick={goToMainMenu}
+        disabled={!isPaused || isEditable || modalOpen || !isReady}
       >
         Voltar
       </button>
 
       <button
         type="button"
-        onMouseDown={toggleEditable}
-        disabled={!isPaused || isWaitingInput || !isReady}
+        onClick={toggleEditable}
+        disabled={!isPaused || modalOpen || !isReady}
       >
         {isEditable ? 'Guardar Tabela' : 'Ativar Edição'}
       </button>
     </div>
   );
 }
-
-export default EstimationTest;

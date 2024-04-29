@@ -16,7 +16,7 @@ interface IAppContextData {
   clockResults: [number, number];
   globalStartTime: number;
   globalResults: [number, number];
-  isWaitingInput: boolean;
+  modalOpen: boolean;
 }
 
 // Define the context state with update method included
@@ -63,7 +63,7 @@ export const useProductionResults = createUseContextState('productionResults');
 export const useClockResults = createUseContextState('clockResults');
 export const useGlobalStartTime = createUseContextState('globalStartTime');
 export const useGlobalResults = createUseContextState('globalResults');
-export const useIsWaitingInput = createUseContextState('isWaitingInput');
+export const useModalOpen = createUseContextState('modalOpen');
 
 export function AppContextProvider({
   children,
@@ -79,7 +79,7 @@ export function AppContextProvider({
     clockResults: [0, 0],
     globalStartTime: 0,
     globalResults: [0, 0],
-    isWaitingInput: false,
+    modalOpen: false,
   });
   // Use useCallback to memoize the updateContext function
   const updateContext = useCallback(

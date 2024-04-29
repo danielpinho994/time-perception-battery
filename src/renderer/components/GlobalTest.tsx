@@ -2,24 +2,22 @@ import { useEffect, useRef, useState } from 'react';
 import {
   useGlobalStartTime,
   useGlobalResults,
-  useIsWaitingInput,
+  useModalOpen,
 } from './AppContext';
 import Timer from './Timer';
 
 export default function GlobalTest() {
   const [globalStartTime, setStartTime] = useGlobalStartTime();
   const [globalResults, setResults] = useGlobalResults();
-  const [isWaitingInput, setWaitingInput] = useIsWaitingInput();
+  const [modalOpen, setModalOpen] = useModalOpen();
 
   const [isPaused, setIsPaused] = useState(true);
   const [time, setTime] = useState(0);
   const timeResult = useRef(0);
 
-  const [modalOpen, setModalOpen] = useState(false);
   const [userInput, setUserInput] = useState<number | null>(null);
 
   const requestUserInput = async () => {
-    setWaitingInput(true);
     setModalOpen(true);
   };
 
@@ -30,16 +28,6 @@ export default function GlobalTest() {
       setIsPaused(false);
     }
   }, [globalStartTime, isPaused]);
-
-  // set global test result after modal is closed
-  useEffect(() => {
-    if (!modalOpen) {
-      if (userInput !== null) {
-        setResults([timeResult.current, userInput * 1000 * 60]);
-        setUserInput(null);
-      }
-    }
-  }, [modalOpen, setResults, userInput]);
 
   // global stopwatch
   useEffect(() => {
@@ -73,8 +61,8 @@ export default function GlobalTest() {
     <button
       type="button"
       className="btn-start-stop"
-      onMouseDown={handleStartStop}
-      disabled={isWaitingInput}
+      onClick={handleStartStop}
+      disabled={modalOpen}
     >
       {isPaused ? 'Começar' : 'Parar'}
     </button>
@@ -109,8 +97,8 @@ export default function GlobalTest() {
         <button
           type="button"
           className="btn-change"
-          onMouseDown={requestUserInput}
-          disabled={isWaitingInput || !isPaused}
+          onClick={requestUserInput}
+          disabled={modalOpen || !isPaused}
         >
           Alterar Resultado
         </button>
@@ -129,10 +117,11 @@ export default function GlobalTest() {
             <button
               type="button"
               className="btn-submit"
-              onMouseDown={() => {
+              onClick={() => {
                 if (userInput !== null) {
                   setModalOpen(false);
-                  setWaitingInput(false);
+                  setResults([time, userInput * 1000 * 60]);
+                  setUserInput(null);
                 }
               }}
             >
@@ -141,10 +130,7 @@ export default function GlobalTest() {
             <button
               type="button"
               className="btn-submit"
-              onMouseDown={() => {
-                setModalOpen(false);
-                setWaitingInput(false);
-              }}
+              onClick={() => setModalOpen(false)}
             >
               Cancelar
             </button>

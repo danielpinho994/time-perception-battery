@@ -1,62 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Timer from './Timer';
+import { useClockResults } from './AppContext';
 
 function Clock() {
-  // --- PERSISTANT CONTEXT --- //
   const navigate = useNavigate();
-  const location = useLocation();
-  const [estimationSequences] = useState<number[]>(
-    location.state.estimationSequences,
-  );
-  const [estimationResults] = useState<number[]>(
-    location.state.estimationResults,
-  );
-  const [productionSequences] = useState<number[]>(
-    location.state.productionSequences,
-  );
-  const [productionResults] = useState<number[]>(
-    location.state.productionResults,
-  );
-  const [clockResults, setResults] = useState<[number, number]>(
-    location.state.clockResults,
-  );
-  const [globalStartTime] = useState<number>(location.state.globalStartTime);
-  const [globalResults] = useState<[number, number]>(
-    location.state.globalResults,
-  );
+  const [clockResults, setResults] = useClockResults();
 
   const goToMainMenu = () => {
-    navigate('/', {
-      state: {
-        estimationSequences,
-        estimationResults,
-        productionSequences,
-        productionResults,
-        clockResults,
-        globalStartTime,
-        globalResults,
-      },
-    });
+    navigate('/');
   };
 
   const [isPaused, setIsPaused] = useState(true);
   const [time, setTime] = useState(0);
-  const [isWaitingInput, setWaitingInput] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [userInput, setUserInput] = useState<number | null>(null);
 
   const requestUserInput = async () => {
-    setWaitingInput(true);
     setModalOpen(true);
   };
-
-  useEffect(() => {
-    if (!modalOpen) {
-      setUserInput(null);
-      setWaitingInput(false);
-    }
-  }, [modalOpen]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -67,12 +29,10 @@ function Clock() {
         setTime(performance.now() - startTime);
       }, 10);
     } else {
-      // stop stop watch
       clearInterval(interval);
     }
 
     return () => {
-      // Clearing interval on unmount or if paused
       clearInterval(interval);
     };
   }, [isPaused]);
@@ -88,8 +48,8 @@ function Clock() {
     <button
       type="button"
       className="btn-start-stop"
-      onMouseDown={handleStartStop}
-      disabled={isWaitingInput}
+      onClick={handleStartStop}
+      disabled={modalOpen}
     >
       {isPaused ? 'Começar' : 'Parar'}
     </button>
@@ -124,8 +84,8 @@ function Clock() {
         <button
           type="button"
           className="btn-change"
-          onMouseDown={requestUserInput}
-          disabled={isWaitingInput || !isPaused}
+          onClick={requestUserInput}
+          disabled={modalOpen || !isPaused}
         >
           Alterar Resultado
         </button>
@@ -135,8 +95,8 @@ function Clock() {
         <button
           type="button"
           className="go-to-test"
-          onMouseDown={goToMainMenu}
-          disabled={isWaitingInput || !isPaused}
+          onClick={goToMainMenu}
+          disabled={modalOpen || !isPaused}
         >
           Voltar
         </button>
@@ -155,10 +115,11 @@ function Clock() {
             <button
               type="button"
               className="btn-submit"
-              onMouseDown={() => {
+              onClick={() => {
                 if (userInput !== null) {
                   setResults([time, userInput * 1000]);
                   setModalOpen(false);
+                  setUserInput(null);
                 }
               }}
             >
@@ -167,7 +128,7 @@ function Clock() {
             <button
               type="button"
               className="btn-submit"
-              onMouseDown={() => setModalOpen(false)}
+              onClick={() => setModalOpen(false)}
             >
               Cancelar
             </button>
