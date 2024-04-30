@@ -1,20 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   useGlobalStartTime,
   useGlobalResults,
   useModalOpen,
-} from './AppContext';
-import Timer from './Timer';
+  useIsClockPaused,
+} from '../AppContext';
+import Timer from '../Timer';
 
 export default function GlobalTest() {
   const [globalStartTime, setStartTime] = useGlobalStartTime();
   const [globalResults, setResults] = useGlobalResults();
   const [modalOpen, setModalOpen] = useModalOpen();
+  const [isClockPaused] = useIsClockPaused();
 
   const [isPaused, setIsPaused] = useState(true);
   const [time, setTime] = useState(0);
-  const timeResult = useRef(0);
-
   const [userInput, setUserInput] = useState<number | null>(null);
 
   const requestUserInput = async () => {
@@ -29,7 +29,7 @@ export default function GlobalTest() {
     }
   }, [globalStartTime, isPaused]);
 
-  // global stopwatch
+  // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -50,30 +50,25 @@ export default function GlobalTest() {
 
   const handleStartStop = () => {
     if (!isPaused) {
-      timeResult.current = time;
       requestUserInput();
       setStartTime(0);
     }
     setIsPaused(!isPaused);
   };
 
-  const StartStopButton = (
+  const startStopButton = (
     <button
       type="button"
       className="btn-start-stop"
       onClick={handleStartStop}
-      disabled={modalOpen}
+      disabled={modalOpen || !isClockPaused}
     >
       {isPaused ? 'Começar' : 'Parar'}
     </button>
   );
 
-  return (
+  const resultDiv = (
     <div>
-      <h2 className="subtitle">Teste Global</h2>
-      <div>{StartStopButton}</div>
-      <Timer time={time} />
-
       <div className="result">
         {globalResults[0] === 0
           ? ''
@@ -92,51 +87,64 @@ export default function GlobalTest() {
               (globalResults[1] / 1000) % 60,
             )}`.slice(-2)}` ?? ''}
       </div>
+    </div>
+  );
 
-      <div>
-        <button
-          type="button"
-          className="btn-change"
-          onClick={requestUserInput}
-          disabled={modalOpen || !isPaused}
-        >
-          Alterar Resultado
-        </button>
-      </div>
+  const editResultButton = (
+    <button
+      type="button"
+      className="btn-change"
+      onClick={requestUserInput}
+      disabled={modalOpen || !isPaused || !isClockPaused}
+    >
+      Alterar Resultado
+    </button>
+  );
 
-      <div>
-        {modalOpen && (
-          <div className="modal">
-            <h2 className="subtitle">Colocar resultado em minutos</h2>
-            <input
-              type="number"
-              className="result"
-              value={userInput ?? undefined} // Handle controlled to uncontrolled warning
-              onChange={(e) => setUserInput(Number(e.target.value))}
-            />
-            <button
-              type="button"
-              className="btn-submit"
-              onClick={() => {
-                if (userInput !== null) {
-                  setModalOpen(false);
-                  setResults([time, userInput * 1000 * 60]);
-                  setUserInput(null);
-                }
-              }}
-            >
-              Submeter
-            </button>
-            <button
-              type="button"
-              className="btn-submit"
-              onClick={() => setModalOpen(false)}
-            >
-              Cancelar
-            </button>
-          </div>
-        )}
-      </div>
+  const userInputModal = (
+    <div>
+      {modalOpen && (
+        <div className="modal">
+          <h2 className="subtitle">Colocar resultado em minutos</h2>
+          <input
+            type="number"
+            className="result"
+            value={userInput ?? undefined} // Handle controlled to uncontrolled warning
+            onChange={(e) => setUserInput(Number(e.target.value))}
+          />
+          <button
+            type="button"
+            className="btn-submit"
+            onClick={() => {
+              if (userInput !== null) {
+                setModalOpen(false);
+                setResults([time, userInput * 1000 * 60]);
+                setUserInput(null);
+              }
+            }}
+          >
+            Submeter
+          </button>
+          <button
+            type="button"
+            className="btn-submit"
+            onClick={() => setModalOpen(false)}
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div>
+      <h2 className="subtitle">Teste Global</h2>
+      <div>{startStopButton}</div>
+      <Timer time={time} />
+      <div>{resultDiv}</div>
+      <div>{editResultButton}</div>
+      <div>{userInputModal}</div>
     </div>
   );
 }

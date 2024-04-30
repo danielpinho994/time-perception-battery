@@ -1,13 +1,14 @@
+/* eslint-disable no-plusplus */
 import { useState, useEffect, useRef, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import beepFile from '../../../assets/beep.wav';
-import Timer from './Timer';
-import { useProductionResults, useProductionSequences } from './AppContext';
+import { useEstimationSequences, useEstimationResults } from '../AppContext';
+import beepFile from '../../../../assets/beep.wav';
+import Timer from '../Timer';
 
-export default function ProductionTest() {
+export default function EstimationTest() {
   const navigate = useNavigate();
-  const [productionSequences] = useProductionSequences();
-  const [productionResults, setResults] = useProductionResults();
+  const [estimationSequences] = useEstimationSequences();
+  const [estimationResults, setResults] = useEstimationResults();
 
   const goToMainMenu = () => {
     navigate('/');
@@ -18,46 +19,71 @@ export default function ProductionTest() {
   const [time, setTime] = useState(0);
   const [isEditable, setEditable] = useState(false);
   const [isTrialInterval, setIsTrialInterval] = useState(
-    productionResults.length === 0,
+    estimationResults.length === 0,
   );
   const [intervalTitle, setIntervalTitle] = useState('');
   const [canStart, setCanStart] = useState(true);
   const beepSound = useRef<HTMLAudioElement>(new Audio(beepFile));
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [userInput, setUserInput] = useState<number | null>(null);
+
+  const requestUserInput = async () => {
+    setModalOpen(true);
+  };
+
   // set interval title
   useEffect(() => {
-    const nextInterval = productionResults.length + 1;
+    const nextInterval = estimationResults.length + 1;
 
     if (nextInterval === 10) {
       setCanStart(false);
       return;
     }
 
-    const nextIntervalTime = productionSequences[nextInterval - 1] / 1000;
+    const nextIntervalTime = estimationSequences[nextInterval - 1] / 1000;
     if (isTrialInterval)
       setIntervalTitle('Intervalo de Experimentação: 4 segundos');
     else
       setIntervalTitle(
         `Intervalo ${nextInterval}: ${nextIntervalTime} segundos`,
       );
-  }, [productionResults, productionSequences, isTrialInterval]);
+  }, [estimationResults, estimationSequences, isTrialInterval]);
 
   // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
+
     if (!isPaused) {
       const startTime = performance.now();
       interval = setInterval(() => {
-        setTime(performance.now() - startTime);
-      }, 1000);
-    } else {
-      clearInterval(interval);
-    }
+        setTime(() => {
+          const currTime = performance.now() - startTime;
+          const limit = isTrialInterval
+            ? 4000
+            : estimationSequences[estimationResults.length];
 
+          if (currTime >= limit) {
+            clearInterval(interval);
+            beepSound.current.play();
+            setIsPaused(true);
+            setIsReady(false);
+            if (!isTrialInterval) requestUserInput();
+            return limit;
+          }
+          return currTime;
+        });
+      }, 1000);
+    }
     return () => {
       clearInterval(interval);
     };
-  }, [isPaused]);
+  }, [
+    estimationResults.length,
+    estimationSequences,
+    isPaused,
+    isTrialInterval,
+  ]);
 
   const handleStartStop = () => {
     beepSound.current.play();
@@ -70,22 +96,18 @@ export default function ProductionTest() {
     setIsReady(true);
   };
 
-  const handleSave = () => {
+  const handleFirstInterval = () => {
     setTime(0);
-    if (isTrialInterval) setIsTrialInterval(false);
-    else {
-      const newResults = [...productionResults, Math.floor((time / 1000) % 60)];
-      setResults(newResults);
-    }
+    setIsTrialInterval(false);
     setIsReady(true);
   };
 
   const StartStopButton = (
     <button
       type="button"
-      className="btn btn-one btn-start"
+      className="btn-start-stop"
       onClick={handleStartStop}
-      disabled={!canStart || isEditable}
+      disabled={!canStart || modalOpen || isEditable}
     >
       {isPaused ? 'Começar' : 'Parar'}
     </button>
@@ -93,21 +115,23 @@ export default function ProductionTest() {
 
   const ResetButtons = (
     <div>
-      <button
-        type="button"
-        className="btn btn-one"
-        onClick={handleSave}
-        disabled={isEditable}
-      >
-        {isTrialInterval ? 'Próximo intervalo' : 'Guardar intervalo'}
-      </button>
+      {isTrialInterval && (
+        <button
+          type="button"
+          className="btn btn-two"
+          onClick={handleFirstInterval}
+          disabled={isEditable}
+        >
+          Próximo intervalo
+        </button>
+      )}
       <button
         type="button"
         className="btn btn-two"
         onClick={handleReset}
-        disabled={isEditable}
+        disabled={modalOpen || isEditable}
       >
-        Repetir intervalo
+        Repetir Intervalo
       </button>
     </div>
   );
@@ -117,7 +141,7 @@ export default function ProductionTest() {
       // resolve empty cells after editing table
       const isPositiveNumber = (value: any): value is number =>
         typeof value === 'number' && value > 0;
-      const transformedArray = productionResults.reduceRight<number[]>(
+      const transformedArray = estimationResults.reduceRight<number[]>(
         (accumulator, current) => {
           if (isPositiveNumber(current)) {
             accumulator.unshift(current);
@@ -137,7 +161,7 @@ export default function ProductionTest() {
     index: number,
     event: FormEvent<HTMLTableCellElement>,
   ) => {
-    const updatedResults = [...productionResults];
+    const updatedResults = [...estimationResults];
     const value = event.currentTarget.textContent; // Assuming the content is text only
     // Attempt to convert the edited content to a number.
     updatedResults[index] = value ? parseInt(value, 10) : 0; // You may need more complex validation
@@ -148,19 +172,19 @@ export default function ProductionTest() {
     <table className="table-results">
       <tr>
         <td>Intervalo</td>
-        {productionSequences.map((_, index) => (
+        {estimationSequences.map((_, index) => (
           <td key={`interval-${index + 1}`}>{index + 1}</td>
         ))}
       </tr>
       <tr>
         <td>Segundos</td>
-        {productionSequences.map((sequence, index) => (
+        {estimationSequences.map((sequence, index) => (
           <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
         ))}
       </tr>
       <tr>
         <td>Resultado</td>
-        {productionResults.map((result, index) => (
+        {estimationResults.map((result, index) => (
           <td
             key={`result-${index + 1}`}
             contentEditable={isEditable}
@@ -169,14 +193,14 @@ export default function ProductionTest() {
             {result}
           </td>
         ))}
-        {[...Array(9 - productionResults.length)].map((_, index) => (
+        {[...Array(9 - estimationResults.length)].map((_, index) => (
           <td
-            key={`empty-${index + productionResults.length + 1}`}
+            key={`empty-${index + estimationResults.length + 1}`}
             contentEditable={
               isEditable &&
-              index + productionResults.length === productionResults.length
+              index + estimationResults.length === estimationResults.length
             }
-            onInput={(e) => onEditable(index + productionResults.length, e)}
+            onInput={(e) => onEditable(index + estimationResults.length, e)}
           />
         ))}
       </tr>
@@ -185,8 +209,48 @@ export default function ProductionTest() {
 
   return (
     <div>
-      <h1>Teste de Produção</h1>
+      <h1>Teste de Estimação</h1>
       <h3>{intervalTitle}</h3>
+
+      <div>
+        {modalOpen && (
+          <div className="modal">
+            <h2>Colocar resultado</h2>
+            <input
+              type="number"
+              value={userInput ?? undefined}
+              onChange={(e) => setUserInput(Number(e.target.value))}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (userInput !== null) {
+                  setModalOpen(false);
+                  const newResults = [...estimationResults, userInput];
+                  setResults(newResults);
+                  setUserInput(null);
+                  setIsReady(true);
+                  setTime(0);
+                }
+              }}
+            >
+              Submeter
+            </button>
+            <button
+              type="button"
+              className="btn-submit"
+              onClick={() => {
+                setModalOpen(false);
+                setUserInput(null);
+                setIsReady(true);
+                setTime(0);
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        )}
+      </div>
 
       <div>{isReady ? StartStopButton : ResetButtons}</div>
       <Timer time={time} />
@@ -196,7 +260,7 @@ export default function ProductionTest() {
       <button
         type="button"
         onClick={goToMainMenu}
-        disabled={!isPaused || isEditable || !isReady}
+        disabled={!isPaused || isEditable || modalOpen || !isReady}
       >
         Voltar
       </button>
@@ -204,7 +268,7 @@ export default function ProductionTest() {
       <button
         type="button"
         onClick={toggleEditable}
-        disabled={!isPaused || !isReady}
+        disabled={!isPaused || modalOpen || !isReady}
       >
         {isEditable ? 'Guardar Tabela' : 'Ativar Edição'}
       </button>

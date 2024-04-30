@@ -7,28 +7,25 @@ import React, {
 } from 'react';
 import generateSequences from './TestSequenceGenerator';
 
-// Define the shape of the data in your context state
 interface IAppContextData {
+  globalStartTime: number;
+  globalResults: [number, number];
+  modalOpen: boolean;
   estimationSequences: number[];
   estimationResults: number[];
   productionSequences: number[];
   productionResults: number[];
   clockResults: [number, number];
-  globalStartTime: number;
-  globalResults: [number, number];
-  modalOpen: boolean;
+  isClockPaused: boolean;
 }
 
-// Define the context state with update method included
 interface IAppContext {
   data: IAppContextData;
   updateContext: (updatedValues: Partial<IAppContextData>) => void;
 }
 
-// Create the context object with a default value
 const AppContext = createContext<IAppContext | null>(null);
 
-// Custom hook for accessing context
 const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {
@@ -37,7 +34,6 @@ const useAppContext = () => {
   return context;
 };
 
-// Custom hook for specific context state and updater
 const createUseContextState = <K extends keyof IAppContextData>(key: K) => {
   return (): [IAppContextData[K], (newValue: IAppContextData[K]) => void] => {
     const context = useAppContext();
@@ -51,7 +47,9 @@ const createUseContextState = <K extends keyof IAppContextData>(key: K) => {
   };
 };
 
-// Exported custom hooks for each context property
+export const useGlobalStartTime = createUseContextState('globalStartTime');
+export const useGlobalResults = createUseContextState('globalResults');
+export const useModalOpen = createUseContextState('modalOpen');
 export const useEstimationSequences = createUseContextState(
   'estimationSequences',
 );
@@ -61,27 +59,24 @@ export const useProductionSequences = createUseContextState(
 );
 export const useProductionResults = createUseContextState('productionResults');
 export const useClockResults = createUseContextState('clockResults');
-export const useGlobalStartTime = createUseContextState('globalStartTime');
-export const useGlobalResults = createUseContextState('globalResults');
-export const useModalOpen = createUseContextState('modalOpen');
+export const useIsClockPaused = createUseContextState('isClockPaused');
 
 export function AppContextProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Define the data part of the state
   const [contextData, setContextData] = useState<IAppContextData>({
+    globalStartTime: 0,
+    globalResults: [0, 0],
+    modalOpen: false,
     estimationSequences: generateSequences(),
     estimationResults: [],
     productionSequences: generateSequences(),
     productionResults: [],
     clockResults: [0, 0],
-    globalStartTime: 0,
-    globalResults: [0, 0],
-    modalOpen: false,
+    isClockPaused: false,
   });
-  // Use useCallback to memoize the updateContext function
   const updateContext = useCallback(
     (updatedValues: Partial<IAppContextData>) => {
       setContextData((prev) => ({ ...prev, ...updatedValues }));

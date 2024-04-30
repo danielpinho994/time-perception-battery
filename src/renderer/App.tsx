@@ -1,9 +1,9 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppContextProvider } from './components/AppContext';
-import MainMenu from './components/MainMenu';
-import EstimationTest from './components/EstimationTest';
-import ProductionTest from './components/ProductionTest';
-import ClockTest from './components/ClockTest';
+import MainMenu from './components/main_menu/MainMenu';
+import EstimationTest from './components/table_tests/EstimationTest';
+import ProductionTest from './components/table_tests/ProductionTest';
+import ClockTest from './components/main_menu/ClockTest';
 import './App.css';
 
 export default function App() {

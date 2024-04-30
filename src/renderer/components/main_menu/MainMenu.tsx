@@ -6,26 +6,26 @@ import {
   useEstimationResults,
   useProductionSequences,
   useProductionResults,
-  useClockResults,
   useModalOpen,
-} from './AppContext';
+  useIsClockPaused,
+} from '../AppContext';
 import GlobalTest from './GlobalTest';
+import ClockTest from './ClockTest';
 
 export default function MainMenu() {
   const navigate = useNavigate();
+  const [modalOpen] = useModalOpen();
   const [estimationSequences] = useEstimationSequences();
   const [estimationResults] = useEstimationResults();
   const [productionSequences] = useProductionSequences();
   const [productionResults] = useProductionResults();
-  const [clockResults] = useClockResults();
-  const [modalOpen] = useModalOpen();
+  const [isClockPaused] = useIsClockPaused();
 
   const goToTest = (testRoute: string) => {
     navigate(testRoute);
   };
 
   const [patientName, setPatientName] = useState('');
-
   const PatientName = (
     <div>
       <h2 className="subtitle">Nome do paciente</h2>
@@ -34,7 +34,7 @@ export default function MainMenu() {
         type="text"
         value={patientName}
         onChange={(e) => setPatientName(e.target.value)}
-        disabled={modalOpen}
+        disabled={modalOpen || !isClockPaused}
       />
     </div>
   );
@@ -46,7 +46,7 @@ export default function MainMenu() {
         className="go-to-test"
         type="button"
         onClick={() => goToTest('/estimation-test')}
-        disabled={modalOpen}
+        disabled={modalOpen || !isClockPaused}
       >
         Ir para teste
       </button>
@@ -83,7 +83,7 @@ export default function MainMenu() {
         type="button"
         className="go-to-test"
         onClick={() => goToTest('/production-test')}
-        disabled={modalOpen}
+        disabled={modalOpen || !isClockPaused}
       >
         Ir para teste
       </button>
@@ -113,38 +113,6 @@ export default function MainMenu() {
     </div>
   );
 
-  const ClockTest = (
-    <div>
-      <h2 className="subtitle">Teste do Relógio</h2>
-      <button
-        type="button"
-        className="go-to-test"
-        onClick={() => goToTest('/clock-test')}
-        disabled={modalOpen}
-      >
-        Ir para teste
-      </button>
-      <div className="result">
-        {clockResults[0] === 0
-          ? ''
-          : `Tempo decorrido: ${`0${Math.floor(
-              (clockResults[0] / 60000) % 60,
-            )}`.slice(-2)} : ${`0${Math.floor(
-              (clockResults[0] / 1000) % 60,
-            )}`.slice(-2)}` ?? ''}
-      </div>
-      <div className="result">
-        {clockResults[1] === 0
-          ? ''
-          : `Resultado: ${`0${Math.floor(
-              (clockResults[1] / 60000) % 60,
-            )}`.slice(-2)} : ${`0${Math.floor(
-              (clockResults[1] / 1000) % 60,
-            )}`.slice(-2)}` ?? ''}
-      </div>
-    </div>
-  );
-
   const componentRef = useRef(null);
   const FooterButtons = (
     <div className="footer-buttons">
@@ -154,7 +122,7 @@ export default function MainMenu() {
         onClick={useReactToPrint({
           content: () => componentRef.current,
         })}
-        disabled={modalOpen}
+        disabled={modalOpen || !isClockPaused}
       >
         Gerar PDF
       </button>
@@ -162,7 +130,7 @@ export default function MainMenu() {
         type="button"
         className="btn-footer"
         onClick={() => console.log('reset')} ////////////////////////////////////////////////////////
-        disabled={modalOpen}
+        disabled={modalOpen || !isClockPaused}
       >
         Gerar novo teste
       </button>
@@ -178,7 +146,10 @@ export default function MainMenu() {
       </div>
       <div className="level">{EstimationTest}</div>
       <div className="level">{ProductionTest}</div>
-      <div className="level">{ClockTest}</div>
+      <div className="level">
+        <ClockTest />
+      </div>
+      <div className="subtitle" />
       <div className="level">{FooterButtons}</div>
     </div>
   );

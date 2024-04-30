@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Timer from './Timer';
-import { useClockResults } from './AppContext';
+import Timer from '../Timer';
+import { useClockResults, useIsClockPaused, useModalOpen } from '../AppContext';
 
-function Clock() {
+export default function Clock() {
   const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useModalOpen();
   const [clockResults, setResults] = useClockResults();
+  const [isClockPaused, setIsClockPaused] = useIsClockPaused(true);
 
   const goToMainMenu = () => {
     navigate('/');
   };
 
-  const [isPaused, setIsPaused] = useState(true);
   const [time, setTime] = useState(0);
-  const [modalOpen, setModalOpen] = useState(false);
   const [userInput, setUserInput] = useState<number | null>(null);
 
   const requestUserInput = async () => {
@@ -22,7 +22,7 @@ function Clock() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    if (!isPaused) {
+    if (!isClockPaused) {
       // start stop watch
       const startTime = performance.now();
       interval = setInterval(() => {
@@ -35,31 +35,31 @@ function Clock() {
     return () => {
       clearInterval(interval);
     };
-  }, [isPaused]);
+  }, [isClockPaused]);
 
   const handleStartStop = () => {
-    if (!isPaused) {
+    if (!isClockPaused) {
       requestUserInput();
     }
-    setIsPaused(!isPaused);
+    setIsClockPaused(!isClockPaused);
   };
 
-  const StartStopButton = (
+  const startStopButton = (
     <button
       type="button"
       className="btn-start-stop"
       onClick={handleStartStop}
       disabled={modalOpen}
     >
-      {isPaused ? 'Começar' : 'Parar'}
+      {isClockPaused ? 'Começar' : 'Parar'}
     </button>
   );
 
   return (
     <div>
-      <h1 className="title">Teste do Relógio </h1>
+      <h2 className="subtitle">Teste do Relógio </h2>
 
-      <div>{StartStopButton}</div>
+      <div>{startStopButton}</div>
       <Timer time={time} />
       <div className="result">
         {clockResults[0] === 0
@@ -85,7 +85,7 @@ function Clock() {
           type="button"
           className="btn-change"
           onClick={requestUserInput}
-          disabled={modalOpen || !isPaused}
+          disabled={modalOpen || !isClockPaused}
         >
           Alterar Resultado
         </button>
@@ -96,7 +96,7 @@ function Clock() {
           type="button"
           className="go-to-test"
           onClick={goToMainMenu}
-          disabled={modalOpen || !isPaused}
+          disabled={modalOpen || !isClockPaused}
         >
           Voltar
         </button>
@@ -138,5 +138,3 @@ function Clock() {
     </div>
   );
 }
-
-export default Clock;
