@@ -1,32 +1,16 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
-import {
-  useEstimationSequences,
-  useEstimationResults,
-  useProductionSequences,
-  useProductionResults,
-  useModalOpen,
-  useIsClockPaused,
-} from '../AppContext';
+import { useModalOpen, useIsClockPaused } from '../AppContext';
 import GlobalTest from './GlobalTest';
 import ClockTest from './ClockTest';
+import ResultsTable from './TableTests';
 
 export default function MainMenu() {
-  const navigate = useNavigate();
   const [modalOpen] = useModalOpen();
-  const [estimationSequences] = useEstimationSequences();
-  const [estimationResults] = useEstimationResults();
-  const [productionSequences] = useProductionSequences();
-  const [productionResults] = useProductionResults();
   const [isClockPaused] = useIsClockPaused();
 
-  const goToTest = (testRoute: string) => {
-    navigate(testRoute);
-  };
-
   const [patientName, setPatientName] = useState('');
-  const PatientName = (
+  const patientNameDiv = (
     <div>
       <h2 className="subtitle">Nome do paciente</h2>
       <input
@@ -39,82 +23,8 @@ export default function MainMenu() {
     </div>
   );
 
-  const EstimationTest = (
-    <div>
-      <h2 className="subtitle">Teste de Estimação</h2>
-      <button
-        className="go-to-test"
-        type="button"
-        onClick={() => goToTest('/estimation-test')}
-        disabled={modalOpen || !isClockPaused}
-      >
-        Ir para teste
-      </button>
-      <table className="table-results">
-        <tr>
-          <td>Intervalo</td>
-          {estimationSequences.map((_, index) => (
-            <td key={`interval-${index + 1}`}>{index + 1}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>Segundos</td>
-          {estimationSequences.map((sequence, index) => (
-            <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
-          ))}
-        </tr>
-        <tr className="result-row">
-          <td>Resultado</td>
-          {estimationResults.map((result, index) => (
-            <td key={`result-${index + 1}`}>{result}</td>
-          ))}
-          {[...Array(9 - estimationResults.length)].map((_, index) => (
-            <td key={`empty-${index + estimationResults.length + 1}`} />
-          ))}
-        </tr>
-      </table>
-    </div>
-  );
-
-  const ProductionTest = (
-    <div>
-      <h2 className="subtitle">Teste de Produção</h2>
-      <button
-        type="button"
-        className="go-to-test"
-        onClick={() => goToTest('/production-test')}
-        disabled={modalOpen || !isClockPaused}
-      >
-        Ir para teste
-      </button>
-      <table className="table-results">
-        <tr>
-          <td>Intervalo</td>
-          {productionSequences.map((_, index) => (
-            <td key={`interval-${index + 1}`}>{index + 1}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>Segundos</td>
-          {productionSequences.map((sequence, index) => (
-            <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
-          ))}
-        </tr>
-        <tr className="result-row">
-          <td>Resultado</td>
-          {productionResults.map((result, index) => (
-            <td key={`result-${index + 1}`}>{result}</td>
-          ))}
-          {[...Array(9 - productionResults.length)].map((_, index) => (
-            <td key={`empty-${index + productionResults.length + 1}`} />
-          ))}
-        </tr>
-      </table>
-    </div>
-  );
-
   const componentRef = useRef(null);
-  const FooterButtons = (
+  const generatePdfButton = (
     <div className="footer-buttons">
       <button
         type="button"
@@ -126,6 +36,11 @@ export default function MainMenu() {
       >
         Gerar PDF
       </button>
+    </div>
+  );
+
+  const resetButton = (
+    <div className="footer-buttons">
       <button
         type="button"
         className="btn-footer"
@@ -140,17 +55,22 @@ export default function MainMenu() {
   return (
     <div ref={componentRef} className="print-scale">
       <h1 className="title">Testes de Percepção Temporal</h1>
-      <div className="level">{PatientName}</div>
+      <div className="level">{patientNameDiv}</div>
       <div className="level">
         <GlobalTest />
       </div>
-      <div className="level">{EstimationTest}</div>
-      <div className="level">{ProductionTest}</div>
+      <div className="level">
+        <ResultsTable title="Teste de Estimação" goToPath="/estimation-test" />
+      </div>
+      <div className="level">
+        <ResultsTable title="Teste de Produção" goToPath="/production-test" />
+      </div>
       <div className="level">
         <ClockTest />
       </div>
       <div className="subtitle" />
-      <div className="level">{FooterButtons}</div>
+      <div className="level">{generatePdfButton}</div>
+      <div className="level">{resetButton}</div>
     </div>
   );
 }

@@ -1,17 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Timer from '../Timer';
 import { useClockResults, useIsClockPaused, useModalOpen } from '../AppContext';
 
 export default function Clock() {
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useModalOpen();
   const [clockResults, setResults] = useClockResults();
-  const [isClockPaused, setIsClockPaused] = useIsClockPaused(true);
-
-  const goToMainMenu = () => {
-    navigate('/');
-  };
+  const [isClockPaused, setIsClockPaused] = useIsClockPaused();
 
   const [time, setTime] = useState(0);
   const [userInput, setUserInput] = useState<number | null>(null);
@@ -88,17 +82,6 @@ export default function Clock() {
           disabled={modalOpen || !isClockPaused}
         >
           Alterar Resultado
-        </button>
-      </div>
-
-      <div>
-        <button
-          type="button"
-          className="go-to-test"
-          onClick={goToMainMenu}
-          disabled={modalOpen || !isClockPaused}
-        >
-          Voltar
         </button>
       </div>
 

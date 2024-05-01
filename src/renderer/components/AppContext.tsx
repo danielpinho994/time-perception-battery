@@ -75,7 +75,7 @@ export function AppContextProvider({
     productionSequences: generateSequences(),
     productionResults: [],
     clockResults: [0, 0],
-    isClockPaused: false,
+    isClockPaused: true,
   });
   const updateContext = useCallback(
     (updatedValues: Partial<IAppContextData>) => {
