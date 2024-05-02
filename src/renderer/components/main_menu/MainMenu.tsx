@@ -1,13 +1,18 @@
 import { useState, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
-import { useModalOpen, useIsClockPaused } from '../AppContext';
+import {
+  useIsClockPaused,
+  useGlobalModalOpen,
+  useClockModalOpen,
+} from '../AppContext';
 import GlobalTest from './GlobalTest';
 import ClockTest from './ClockTest';
 import ResultsTable from './TableTests';
 
 export default function MainMenu() {
-  const [modalOpen] = useModalOpen();
+  const [globalModalOpen] = useGlobalModalOpen();
   const [isClockPaused] = useIsClockPaused();
+  const [clockModalOpen] = useClockModalOpen();
 
   const [patientName, setPatientName] = useState('');
   const patientNameDiv = (
@@ -18,21 +23,21 @@ export default function MainMenu() {
         type="text"
         value={patientName}
         onChange={(e) => setPatientName(e.target.value)}
-        disabled={modalOpen || !isClockPaused}
+        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
       />
     </div>
   );
 
-  const componentRef = useRef(null);
+  const pdfComponentRef = useRef(null);
   const generatePdfButton = (
     <div className="footer-buttons">
       <button
         type="button"
         className="btn-footer"
         onClick={useReactToPrint({
-          content: () => componentRef.current,
+          content: () => pdfComponentRef.current,
         })}
-        disabled={modalOpen || !isClockPaused}
+        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
       >
         Gerar PDF
       </button>
@@ -45,7 +50,7 @@ export default function MainMenu() {
         type="button"
         className="btn-footer"
         onClick={() => console.log('reset')} ////////////////////////////////////////////////////////
-        disabled={modalOpen || !isClockPaused}
+        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
       >
         Gerar novo teste
       </button>
@@ -53,24 +58,32 @@ export default function MainMenu() {
   );
 
   return (
-    <div ref={componentRef} className="print-scale">
-      <h1 className="title">Testes de Percepção Temporal</h1>
-      <div className="level">{patientNameDiv}</div>
-      <div className="level">
-        <GlobalTest />
+    <>
+      <div ref={pdfComponentRef} className="print-scale">
+        <h1 className="title">Testes de Percepção Temporal</h1>
+        <div className="level">{patientNameDiv}</div>
+        <div className="level">
+          <GlobalTest />
+        </div>
+        <div className="level">
+          <ResultsTable
+            title="Teste de Estimação"
+            goToPath="/estimation-test"
+          />
+        </div>
+        <div className="level">
+          <ResultsTable title="Teste de Produção" goToPath="/production-test" />
+        </div>
+        <div className="level">
+          <ClockTest />
+        </div>
       </div>
-      <div className="level">
-        <ResultsTable title="Teste de Estimação" goToPath="/estimation-test" />
+      <div>
+        <div className="subtitle" />
+        <div className="level">{generatePdfButton}</div>
+        <div className="subtitle" />
+        <div className="level">{resetButton}</div>
       </div>
-      <div className="level">
-        <ResultsTable title="Teste de Produção" goToPath="/production-test" />
-      </div>
-      <div className="level">
-        <ClockTest />
-      </div>
-      <div className="subtitle" />
-      <div className="level">{generatePdfButton}</div>
-      <div className="level">{resetButton}</div>
-    </div>
+    </>
   );
 }

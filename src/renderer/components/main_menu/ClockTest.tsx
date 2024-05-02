@@ -1,19 +1,26 @@
 import { useState, useEffect } from 'react';
 import Timer from '../Timer';
-import { useClockResults, useIsClockPaused, useModalOpen } from '../AppContext';
+import {
+  useClockResults,
+  useIsClockPaused,
+  useGlobalModalOpen,
+  useClockModalOpen,
+} from '../AppContext';
 
 export default function Clock() {
-  const [modalOpen, setModalOpen] = useModalOpen();
+  const [globalModalOpen] = useGlobalModalOpen();
   const [clockResults, setResults] = useClockResults();
   const [isClockPaused, setIsClockPaused] = useIsClockPaused();
+  const [clockModalOpen, setClockModalOpen] = useClockModalOpen();
 
   const [time, setTime] = useState(0);
   const [userInput, setUserInput] = useState<number | null>(null);
 
   const requestUserInput = async () => {
-    setModalOpen(true);
+    setClockModalOpen(true);
   };
 
+  // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
     if (!isClockPaused) {
@@ -43,7 +50,7 @@ export default function Clock() {
       type="button"
       className="btn-start-stop"
       onClick={handleStartStop}
-      disabled={modalOpen}
+      disabled={globalModalOpen || clockModalOpen}
     >
       {isClockPaused ? 'Começar' : 'Parar'}
     </button>
@@ -79,14 +86,14 @@ export default function Clock() {
           type="button"
           className="btn-change"
           onClick={requestUserInput}
-          disabled={modalOpen || !isClockPaused}
+          disabled={globalModalOpen || clockModalOpen || !isClockPaused}
         >
           Alterar Resultado
         </button>
       </div>
 
       <div>
-        {modalOpen && (
+        {clockModalOpen && (
           <div className="modal">
             <h2 className="subtitle">Colocar resultado em segundos</h2>
             <input
@@ -101,7 +108,7 @@ export default function Clock() {
               onClick={() => {
                 if (userInput !== null) {
                   setResults([time, userInput * 1000]);
-                  setModalOpen(false);
+                  setClockModalOpen(false);
                   setUserInput(null);
                 }
               }}
@@ -111,7 +118,7 @@ export default function Clock() {
             <button
               type="button"
               className="btn-submit"
-              onClick={() => setModalOpen(false)}
+              onClick={() => setClockModalOpen(false)}
             >
               Cancelar
             </button>

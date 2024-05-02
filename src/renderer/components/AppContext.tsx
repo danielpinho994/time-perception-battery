@@ -10,13 +10,14 @@ import generateSequences from './TestSequenceGenerator';
 interface IAppContextData {
   globalStartTime: number;
   globalResults: [number, number];
-  modalOpen: boolean;
+  globalModalOpen: boolean;
   estimationSequences: number[];
   estimationResults: number[];
   productionSequences: number[];
   productionResults: number[];
   clockResults: [number, number];
   isClockPaused: boolean;
+  clockModalOpen: boolean;
 }
 
 interface IAppContext {
@@ -49,7 +50,7 @@ const createUseContextState = <K extends keyof IAppContextData>(key: K) => {
 
 export const useGlobalStartTime = createUseContextState('globalStartTime');
 export const useGlobalResults = createUseContextState('globalResults');
-export const useModalOpen = createUseContextState('modalOpen');
+export const useGlobalModalOpen = createUseContextState('globalModalOpen');
 export const useEstimationSequences = createUseContextState(
   'estimationSequences',
 );
@@ -60,6 +61,7 @@ export const useProductionSequences = createUseContextState(
 export const useProductionResults = createUseContextState('productionResults');
 export const useClockResults = createUseContextState('clockResults');
 export const useIsClockPaused = createUseContextState('isClockPaused');
+export const useClockModalOpen = createUseContextState('clockModalOpen');
 
 export function AppContextProvider({
   children,
@@ -69,13 +71,14 @@ export function AppContextProvider({
   const [contextData, setContextData] = useState<IAppContextData>({
     globalStartTime: 0,
     globalResults: [0, 0],
-    modalOpen: false,
+    globalModalOpen: false,
     estimationSequences: generateSequences(),
     estimationResults: [],
     productionSequences: generateSequences(),
     productionResults: [],
     clockResults: [0, 0],
     isClockPaused: true,
+    clockModalOpen: false,
   });
   const updateContext = useCallback(
     (updatedValues: Partial<IAppContextData>) => {

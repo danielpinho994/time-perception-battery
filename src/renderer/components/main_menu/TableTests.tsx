@@ -1,17 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import {
-  useModalOpen,
   useEstimationSequences,
   useEstimationResults,
   useProductionSequences,
   useProductionResults,
   useIsClockPaused,
+  useClockModalOpen,
+  useGlobalModalOpen,
 } from '../AppContext';
 
 export default function ResultsTable({ title, goToPath }) {
   const navigate = useNavigate();
-  const [modalOpen] = useModalOpen();
+  const [globalModalOpen] = useGlobalModalOpen();
   const [isClockPaused] = useIsClockPaused();
+  const [clockModalOpen] = useClockModalOpen();
+
   const [sequences] =
     title === 'Teste de Estimação'
       ? useEstimationSequences()
@@ -32,7 +35,7 @@ export default function ResultsTable({ title, goToPath }) {
         className="go-to-test"
         type="button"
         onClick={() => goToTest(goToPath)}
-        disabled={modalOpen || !isClockPaused}
+        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
       >
         Ir para teste
       </button>

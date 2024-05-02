@@ -2,23 +2,25 @@ import { useEffect, useState } from 'react';
 import {
   useGlobalStartTime,
   useGlobalResults,
-  useModalOpen,
+  useGlobalModalOpen,
   useIsClockPaused,
+  useClockModalOpen,
 } from '../AppContext';
 import Timer from '../Timer';
 
 export default function GlobalTest() {
   const [globalStartTime, setStartTime] = useGlobalStartTime();
   const [globalResults, setResults] = useGlobalResults();
-  const [modalOpen, setModalOpen] = useModalOpen();
+  const [globalModalOpen, setGlobalModalOpen] = useGlobalModalOpen();
   const [isClockPaused] = useIsClockPaused();
+  const [clockModalOpen] = useClockModalOpen();
 
   const [isPaused, setIsPaused] = useState(true);
   const [time, setTime] = useState(0);
   const [userInput, setUserInput] = useState<number | null>(null);
 
   const requestUserInput = async () => {
-    setModalOpen(true);
+    setGlobalModalOpen(true);
   };
 
   // restart global clock after coming back to MainMenu
@@ -61,7 +63,7 @@ export default function GlobalTest() {
       type="button"
       className="btn-start-stop"
       onClick={handleStartStop}
-      disabled={modalOpen || !isClockPaused}
+      disabled={globalModalOpen || clockModalOpen || !isClockPaused}
     >
       {isPaused ? 'Começar' : 'Parar'}
     </button>
@@ -95,7 +97,9 @@ export default function GlobalTest() {
       type="button"
       className="btn-change"
       onClick={requestUserInput}
-      disabled={modalOpen || !isPaused || !isClockPaused}
+      disabled={
+        globalModalOpen || clockModalOpen || !isPaused || !isClockPaused
+      }
     >
       Alterar Resultado
     </button>
@@ -103,7 +107,7 @@ export default function GlobalTest() {
 
   const userInputModal = (
     <div>
-      {modalOpen && (
+      {globalModalOpen && (
         <div className="modal">
           <h2 className="subtitle">Colocar resultado em minutos</h2>
           <input
@@ -117,7 +121,7 @@ export default function GlobalTest() {
             className="btn-submit"
             onClick={() => {
               if (userInput !== null) {
-                setModalOpen(false);
+                setGlobalModalOpen(false);
                 setResults([time, userInput * 1000 * 60]);
                 setUserInput(null);
               }
@@ -128,7 +132,7 @@ export default function GlobalTest() {
           <button
             type="button"
             className="btn-submit"
-            onClick={() => setModalOpen(false)}
+            onClick={() => setGlobalModalOpen(false)}
           >
             Cancelar
           </button>
