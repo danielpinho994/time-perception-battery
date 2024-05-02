@@ -11,6 +11,7 @@ interface IAppContextData {
   globalStartTime: number;
   globalResults: [number, number];
   globalModalOpen: boolean;
+  isGlobalPaused: boolean;
   estimationSequences: number[];
   estimationResults: number[];
   productionSequences: number[];
@@ -51,6 +52,7 @@ const createUseContextState = <K extends keyof IAppContextData>(key: K) => {
 export const useGlobalStartTime = createUseContextState('globalStartTime');
 export const useGlobalResults = createUseContextState('globalResults');
 export const useGlobalModalOpen = createUseContextState('globalModalOpen');
+export const useIsGlobalPaused = createUseContextState('isGlobalPaused');
 export const useEstimationSequences = createUseContextState(
   'estimationSequences',
 );
@@ -72,6 +74,7 @@ export function AppContextProvider({
     globalStartTime: 0,
     globalResults: [0, 0],
     globalModalOpen: false,
+    isGlobalPaused: true,
     estimationSequences: generateSequences(),
     estimationResults: [],
     productionSequences: generateSequences(),

@@ -5,6 +5,7 @@ import {
   useGlobalModalOpen,
   useIsClockPaused,
   useClockModalOpen,
+  useIsGlobalPaused,
 } from '../AppContext';
 import Timer from '../Timer';
 
@@ -12,10 +13,10 @@ export default function GlobalTest() {
   const [globalStartTime, setStartTime] = useGlobalStartTime();
   const [globalResults, setResults] = useGlobalResults();
   const [globalModalOpen, setGlobalModalOpen] = useGlobalModalOpen();
+  const [isGlobalPaused, setIsGlobalPaused] = useIsGlobalPaused();
   const [isClockPaused] = useIsClockPaused();
   const [clockModalOpen] = useClockModalOpen();
 
-  const [isPaused, setIsPaused] = useState(true);
   const [time, setTime] = useState(0);
   const [userInput, setUserInput] = useState<number | null>(null);
 
@@ -23,19 +24,11 @@ export default function GlobalTest() {
     setGlobalModalOpen(true);
   };
 
-  // restart global clock after coming back to MainMenu
-  useEffect(() => {
-    if (isPaused && globalStartTime > 0) {
-      setTime(performance.now() - globalStartTime);
-      setIsPaused(false);
-    }
-  }, [globalStartTime, isPaused]);
-
   // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (!isPaused) {
+    if (!isGlobalPaused) {
       if (globalStartTime === 0) {
         setStartTime(performance.now());
       }
@@ -48,14 +41,14 @@ export default function GlobalTest() {
     return () => {
       clearInterval(interval);
     };
-  }, [globalStartTime, isPaused, setStartTime]);
+  }, [globalStartTime, isGlobalPaused, setStartTime]);
 
   const handleStartStop = () => {
-    if (!isPaused) {
+    if (!isGlobalPaused) {
       requestUserInput();
       setStartTime(0);
     }
-    setIsPaused(!isPaused);
+    setIsGlobalPaused(!isGlobalPaused);
   };
 
   const startStopButton = (
@@ -65,7 +58,7 @@ export default function GlobalTest() {
       onClick={handleStartStop}
       disabled={globalModalOpen || clockModalOpen || !isClockPaused}
     >
-      {isPaused ? 'Começar' : 'Parar'}
+      {isGlobalPaused ? 'Começar' : 'Parar'}
     </button>
   );
 
@@ -98,7 +91,7 @@ export default function GlobalTest() {
       className="btn-change"
       onClick={requestUserInput}
       disabled={
-        globalModalOpen || clockModalOpen || !isPaused || !isClockPaused
+        globalModalOpen || clockModalOpen || !isGlobalPaused || !isClockPaused
       }
     >
       Alterar Resultado

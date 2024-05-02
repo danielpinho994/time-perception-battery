@@ -4,6 +4,7 @@ import {
   useIsClockPaused,
   useGlobalModalOpen,
   useClockModalOpen,
+  useIsGlobalPaused,
 } from '../AppContext';
 import GlobalTest from './GlobalTest';
 import ClockTest from './ClockTest';
@@ -11,6 +12,7 @@ import ResultsTable from './TableTests';
 
 export default function MainMenu() {
   const [globalModalOpen] = useGlobalModalOpen();
+  const [isGlobalPaused] = useIsGlobalPaused();
   const [isClockPaused] = useIsClockPaused();
   const [clockModalOpen] = useClockModalOpen();
 
@@ -37,7 +39,9 @@ export default function MainMenu() {
         onClick={useReactToPrint({
           content: () => pdfComponentRef.current,
         })}
-        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
+        disabled={
+          globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
+        }
       >
         Gerar PDF
       </button>
@@ -50,7 +54,9 @@ export default function MainMenu() {
         type="button"
         className="btn-footer"
         onClick={() => console.log('reset')} ////////////////////////////////////////////////////////
-        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
+        disabled={
+          globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
+        }
       >
         Gerar novo teste
       </button>
