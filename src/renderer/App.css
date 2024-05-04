@@ -88,6 +88,8 @@
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 20px;
+  text-align: center;
+  font-size: 1.25rem;
  }
  .table-results {
   width: 100%;
