@@ -24,17 +24,66 @@ interface IAppContextData {
 interface IAppContext {
   data: IAppContextData;
   updateContext: (updatedValues: Partial<IAppContextData>) => void;
+  resetContext: () => void;
 }
 
 const AppContext = createContext<IAppContext | null>(null);
 
-const useAppContext = () => {
+export const useAppContext = () => {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('useAppContext must be used within a AppContextProvider');
   }
   return context;
 };
+
+const defaultContextData = () => ({
+  globalStartTime: 0,
+  globalResults: [0, 0],
+  globalModalOpen: false,
+  isGlobalPaused: true,
+  estimationSequences: generateSequences(),
+  estimationResults: [],
+  productionSequences: generateSequences(),
+  productionResults: [],
+  clockResults: [0, 0],
+  isClockPaused: true,
+  clockModalOpen: false,
+});
+
+export function AppContextProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [contextData, setContextData] =
+    useState<IAppContextData>(defaultContextData);
+
+  const updateContext = useCallback(
+    (updatedValues: Partial<IAppContextData>) => {
+      setContextData((prev) => ({ ...prev, ...updatedValues }));
+    },
+    [],
+  );
+
+  const resetContext = useCallback(() => {
+    setContextData(defaultContextData());
+  }, []);
+
+  // Memoizing the context value
+  const contextValue: IAppContext = useMemo(
+    () => ({
+      data: contextData,
+      updateContext,
+      resetContext,
+    }),
+    [contextData, updateContext, resetContext],
+  );
+
+  return (
+    <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
+  );
+}
 
 const createUseContextState = <K extends keyof IAppContextData>(key: K) => {
   return (): [IAppContextData[K], (newValue: IAppContextData[K]) => void] => {
@@ -43,7 +92,7 @@ const createUseContextState = <K extends keyof IAppContextData>(key: K) => {
       (newValue: IAppContextData[K]) => {
         context.updateContext({ [key]: newValue });
       },
-      [context], // context is stable and doesn't change, so it's safe to omit from dependencies
+      [context],
     );
     return [context.data[key], setValue];
   };
@@ -64,52 +113,3 @@ export const useProductionResults = createUseContextState('productionResults');
 export const useClockResults = createUseContextState('clockResults');
 export const useIsClockPaused = createUseContextState('isClockPaused');
 export const useClockModalOpen = createUseContextState('clockModalOpen');
-
-export function AppContextProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [contextData, setContextData] = useState<IAppContextData>({
-    globalStartTime: 0,
-    globalResults: [0, 0],
-    globalModalOpen: false,
-    isGlobalPaused: true,
-    estimationSequences: generateSequences(),
-    estimationResults: [],
-    productionSequences: generateSequences(),
-    productionResults: [],
-    clockResults: [0, 0],
-    isClockPaused: true,
-    clockModalOpen: false,
-  });
-  const updateContext = useCallback(
-    (updatedValues: Partial<IAppContextData>) => {
-      setContextData((prev) => ({ ...prev, ...updatedValues }));
-    },
-    [],
-  );
-  const contextValue: IAppContext = useMemo(
-    () => ({
-      data: contextData,
-      updateContext,
-    }),
-    [contextData, updateContext],
-  );
-  return (
-    <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
-  );
-}
-
-/*
-export const resetContext = () => {
-  setEstimationSequences(() => generateSequences());
-  setEstimationResults([]);
-  setProductionSequences(() => generateSequences());
-  setProductionResults([]);
-  setStartTime(0);
-  setClockResults([0, 0]);
-  setResults([0, 0]);
-  setIsPaused(true);
-};
-*/

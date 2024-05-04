@@ -21,7 +21,7 @@
  input, button, textarea {
   font-family: inherit;
  }
- h1.title {
+ .title {
   color: #333;
   text-align: center;
   margin: 1rem 0;
@@ -143,7 +143,7 @@
  @media print {
   .print-scale, .print-scale * {
     visibility: visible; /* Make sure all printable content is visible */
-    margin: 0 !important;
+    margin: 5 !important;
     padding: 0 !important;
     page-break-after: avoid !important;
     page-break-before: avoid !important;

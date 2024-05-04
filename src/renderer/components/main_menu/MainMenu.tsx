@@ -5,6 +5,7 @@ import {
   useGlobalModalOpen,
   useClockModalOpen,
   useIsGlobalPaused,
+  useAppContext,
 } from '../AppContext';
 import GlobalTest from './GlobalTest';
 import ClockTest from './ClockTest';
@@ -15,6 +16,7 @@ export default function MainMenu() {
   const [isGlobalPaused] = useIsGlobalPaused();
   const [isClockPaused] = useIsClockPaused();
   const [clockModalOpen] = useClockModalOpen();
+  const { resetContext } = useAppContext();
 
   const [patientName, setPatientName] = useState('');
   const patientNameDiv = (
@@ -30,20 +32,20 @@ export default function MainMenu() {
     </div>
   );
 
-  const pdfComponentRef = useRef(null);
-  const generatePdfButton = (
+  const printRef = useRef(null);
+  const printResultsButton = (
     <div className="footer-buttons">
       <button
         type="button"
         className="btn-footer"
         onClick={useReactToPrint({
-          content: () => pdfComponentRef.current,
+          content: () => printRef.current,
         })}
         disabled={
           globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
         }
       >
-        Gerar PDF
+        Imprimir Resultados
       </button>
     </div>
   );
@@ -53,7 +55,7 @@ export default function MainMenu() {
       <button
         type="button"
         className="btn-footer"
-        onClick={() => console.log('reset')} ////////////////////////////////////////////////////////
+        onClick={resetContext}
         disabled={
           globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
         }
@@ -65,7 +67,7 @@ export default function MainMenu() {
 
   return (
     <>
-      <div ref={pdfComponentRef} className="print-scale">
+      <div ref={printRef} className="print-scale">
         <h1 className="title">Testes de Percepção Temporal</h1>
         <div className="level">{patientNameDiv}</div>
         <div className="level">
@@ -86,7 +88,7 @@ export default function MainMenu() {
       </div>
       <div>
         <div className="subtitle" />
-        <div className="level">{generatePdfButton}</div>
+        <div className="level">{printResultsButton}</div>
         <div className="subtitle" />
         <div className="level">{resetButton}</div>
       </div>

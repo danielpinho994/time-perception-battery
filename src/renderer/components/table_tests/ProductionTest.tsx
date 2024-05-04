@@ -74,7 +74,7 @@ export default function ProductionTest() {
     setTime(0);
     if (isTrialInterval) setIsTrialInterval(false);
     else {
-      const newResults = [...productionResults, Math.floor((time / 1000) % 60)];
+      const newResults = [...productionResults, Math.floor(time / 1000)];
       setResults(newResults);
     }
     setIsReady(true);
