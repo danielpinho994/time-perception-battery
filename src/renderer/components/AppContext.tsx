@@ -8,6 +8,7 @@ import React, {
 import generateSequences from './TestSequenceGenerator';
 
 interface IAppContextData {
+  patientName: string;
   globalStartTime: number;
   globalResults: [number, number];
   globalModalOpen: boolean;
@@ -38,6 +39,7 @@ export const useAppContext = () => {
 };
 
 const defaultContextData = () => ({
+  patientName: '',
   globalStartTime: 0,
   globalResults: [0, 0],
   globalModalOpen: false,
@@ -98,6 +100,7 @@ const createUseContextState = <K extends keyof IAppContextData>(key: K) => {
   };
 };
 
+export const usePatientName = createUseContextState('patientName');
 export const useGlobalStartTime = createUseContextState('globalStartTime');
 export const useGlobalResults = createUseContextState('globalResults');
 export const useGlobalModalOpen = createUseContextState('globalModalOpen');

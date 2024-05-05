@@ -9,7 +9,7 @@ import {
   useGlobalModalOpen,
 } from '../AppContext';
 
-export default function ResultsTable({ title, goToPath }) {
+export default function TableTests({ title, goToPath, className }) {
   const navigate = useNavigate();
   const [globalModalOpen] = useGlobalModalOpen();
   const [isClockPaused] = useIsClockPaused();
@@ -29,17 +29,16 @@ export default function ResultsTable({ title, goToPath }) {
   };
 
   return (
-    <div>
-      <h2 className="subtitle">{title}</h2>
+    <div className={className}>
+      <h2>{title}</h2>
       <button
-        className="go-to-test"
         type="button"
         onClick={() => goToTest(goToPath)}
         disabled={globalModalOpen || clockModalOpen || !isClockPaused}
       >
         Ir para teste
       </button>
-      <table className="table-results">
+      <table>
         <tr>
           <td>Intervalo</td>
           {sequences.map((_, index) => (
@@ -52,7 +51,7 @@ export default function ResultsTable({ title, goToPath }) {
             <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
           ))}
         </tr>
-        <tr className="result-row">
+        <tr className="table-results-row">
           <td>Resultado</td>
           {results.map((result, index) => (
             <td key={`result-${index + 1}`}>{result}</td>

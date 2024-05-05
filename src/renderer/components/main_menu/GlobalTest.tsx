@@ -7,9 +7,10 @@ import {
   useClockModalOpen,
   useIsGlobalPaused,
 } from '../AppContext';
-import Timer from '../Timer';
+import Timer from '../common/Timer';
+import UserInputModal from '../common/UserInputModal';
 
-export default function GlobalTest() {
+export default function GlobalTest({ className }) {
   const [globalStartTime, setStartTime] = useGlobalStartTime();
   const [globalResults, setResults] = useGlobalResults();
   const [globalModalOpen, setGlobalModalOpen] = useGlobalModalOpen();
@@ -69,14 +70,16 @@ export default function GlobalTest() {
           ? ''
           : `Tempo decorrido: ${`0${Math.floor(
               (globalResults[0] / 60000) % 60,
-            )}`.slice(-2)} : ${`0${Math.floor(
+            )}`.slice(-2)}:${`0${Math.floor(
               (globalResults[0] / 1000) % 60,
             )}`.slice(-2)}` ?? ''}
       </div>
       <div className="result">
         {globalResults[1] === 0
           ? ''
-          : `Resultado: ${globalResults[1]} minutos` ?? ''}
+          : `Resultado: ${globalResults[1]} ${
+              globalResults[1] === 1 ? 'minuto' : 'minutos'
+            }` ?? ''}
       </div>
     </div>
   );
@@ -84,7 +87,7 @@ export default function GlobalTest() {
   const editResultButton = (
     <button
       type="button"
-      onClick={requestUserInput}
+      onClick={async () => setGlobalModalOpen(true)}
       disabled={
         globalModalOpen || clockModalOpen || !isGlobalPaused || !isClockPaused
       }
@@ -93,50 +96,32 @@ export default function GlobalTest() {
     </button>
   );
 
-  const userInputModal = (
-    <div>
-      {globalModalOpen && (
-        <div className="modal">
-          <h2 className="subtitle">Colocar resultado em minutos</h2>
-          <input
-            type="number"
-            className="input-modal"
-            value={userInput ?? undefined} // Handle controlled to uncontrolled warning
-            onChange={(e) => setUserInput(Number(e.target.value))}
-          />
-          <button
-            type="button"
-            className="btn-submit"
-            onClick={() => {
-              if (userInput !== null) {
-                setGlobalModalOpen(false);
-                setResults([time, userInput]);
-                setUserInput(null);
-              }
-            }}
-          >
-            Submeter
-          </button>
-          <button
-            type="button"
-            className="btn-cancel"
-            onClick={() => setGlobalModalOpen(false)}
-          >
-            Cancelar
-          </button>
-        </div>
-      )}
-    </div>
-  );
+  const cancelUserInput = () => {
+    setGlobalModalOpen(false);
+    setUserInput(null);
+    setTime(0);
+  };
+
+  const saveUserInput = () => {
+    const input = userInput ?? 0;
+    setResults([time === 0 ? globalResults[0] : time, input]);
+    cancelUserInput();
+  };
 
   return (
-    <div>
-      <h2 className="subtitle">Teste Global</h2>
+    <div className={className}>
+      <h2>Teste Global</h2>
       <div>{startStopButton}</div>
       <Timer time={time} />
       <div>{resultDiv}</div>
       <div>{editResultButton}</div>
-      <div>{userInputModal}</div>
+      <UserInputModal
+        isModalOpen={globalModalOpen}
+        userInput={userInput}
+        setUserInput={setUserInput}
+        saveUserInput={saveUserInput}
+        cancelUserInput={cancelUserInput}
+      />
     </div>
   );
 }

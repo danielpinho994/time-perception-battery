@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import Timer from '../Timer';
+import Timer from '../common/Timer';
 import {
   useClockResults,
   useIsClockPaused,
   useGlobalModalOpen,
   useClockModalOpen,
 } from '../AppContext';
+import UserInputModal from '../common/UserInputModal';
 
-export default function Clock() {
+export default function Clock({ className }) {
   const [globalModalOpen] = useGlobalModalOpen();
   const [clockResults, setResults] = useClockResults();
   const [isClockPaused, setIsClockPaused] = useIsClockPaused();
@@ -15,10 +16,6 @@ export default function Clock() {
 
   const [time, setTime] = useState(0);
   const [userInput, setUserInput] = useState<number | null>(null);
-
-  const requestUserInput = async () => {
-    setClockModalOpen(true);
-  };
 
   // stopwatch
   useEffect(() => {
@@ -56,18 +53,30 @@ export default function Clock() {
     </button>
   );
 
-  return (
-    <div>
-      <h2 className="subtitle">Teste do Relógio </h2>
+  const cancelUserInput = () => {
+    setClockModalOpen(false);
+    setUserInput(null);
+    setTime(0);
+  };
 
+  const saveUserInput = () => {
+    const input = userInput ?? 0;
+    setResults([time === 0 ? clockResults[0] : time, input]);
+    cancelUserInput();
+  };
+
+  return (
+    <div className={className}>
+      <h2>Teste do Relógio </h2>
       <div>{startStopButton}</div>
       <Timer time={time} />
+
       <div className="result">
         {clockResults[0] === 0
           ? ''
           : `Tempo decorrido: ${`0${Math.floor(
               (clockResults[0] / 60000) % 60,
-            )}`.slice(-2)} : ${`0${Math.floor(
+            )}`.slice(-2)}:${`0${Math.floor(
               (clockResults[0] / 1000) % 60,
             )}`.slice(-2)}` ?? ''}
       </div>
@@ -80,46 +89,20 @@ export default function Clock() {
       <div>
         <button
           type="button"
-          onClick={requestUserInput}
+          onClick={async () => setClockModalOpen(true)}
           disabled={globalModalOpen || clockModalOpen || !isClockPaused}
         >
           Alterar Resultado
         </button>
       </div>
 
-      <div>
-        {clockModalOpen && (
-          <div className="modal">
-            <h2 className="subtitle">Colocar resultado em segundos</h2>
-            <input
-              type="number"
-              className="input-modal"
-              value={userInput ?? undefined} // Handle controlled to uncontrolled warning
-              onChange={(e) => setUserInput(Number(e.target.value))}
-            />
-            <button
-              type="button"
-              className="btn-submit"
-              onClick={() => {
-                if (userInput !== null) {
-                  setResults([time, userInput]);
-                  setClockModalOpen(false);
-                  setUserInput(null);
-                }
-              }}
-            >
-              Submeter
-            </button>
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={() => setClockModalOpen(false)}
-            >
-              Cancelar
-            </button>
-          </div>
-        )}
-      </div>
+      <UserInputModal
+        isModalOpen={clockModalOpen}
+        userInput={userInput}
+        setUserInput={setUserInput}
+        saveUserInput={saveUserInput}
+        cancelUserInput={cancelUserInput}
+      />
     </div>
   );
 }

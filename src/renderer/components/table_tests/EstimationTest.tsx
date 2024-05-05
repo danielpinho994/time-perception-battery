@@ -1,29 +1,26 @@
 /* eslint-disable no-plusplus */
-import { useState, useEffect, useRef, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import { useEstimationSequences, useEstimationResults } from '../AppContext';
 import beepFile from '../../../../assets/beep.wav';
-import Timer from '../Timer';
+import Timer from '../common/Timer';
+import Table, { MainMenuButton, EditResultsButton } from './CommonTableTests';
+import UserInputModal from '../common/UserInputModal';
 
 export default function EstimationTest() {
-  const navigate = useNavigate();
   const [estimationSequences] = useEstimationSequences();
   const [estimationResults, setResults] = useEstimationResults();
 
-  const goToMainMenu = () => {
-    navigate('/');
-  };
-
-  const [isReady, setIsReady] = useState(true);
-  const [isPaused, setIsPaused] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
-  const [isEditable, setEditable] = useState(false);
   const [isTrialInterval, setIsTrialInterval] = useState(
     estimationResults.length === 0,
   );
+  const [waitingNonModalInput, setWaitingNonModalInput] = useState(false);
+
   const [intervalTitle, setIntervalTitle] = useState('');
-  const [canStart, setCanStart] = useState(true);
+  const [limitReached, setLimitReached] = useState(false);
   const beepSound = useRef<HTMLAudioElement>(new Audio(beepFile));
+  const [isEditable, setEditable] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [userInput, setUserInput] = useState<number | null>(null);
@@ -34,12 +31,12 @@ export default function EstimationTest() {
 
   // set interval title
   useEffect(() => {
-    const nextInterval = estimationResults.length + 1;
+    let nextInterval = estimationResults.length + 1;
 
     if (nextInterval === 10) {
-      setCanStart(false);
-      return;
-    }
+      setLimitReached(true);
+      nextInterval = 9;
+    } else setLimitReached(false);
 
     const nextIntervalTime = estimationSequences[nextInterval - 1] / 1000;
     if (isTrialInterval)
@@ -54,7 +51,7 @@ export default function EstimationTest() {
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (!isPaused) {
+    if (isRunning) {
       const startTime = performance.now();
       interval = setInterval(() => {
         setTime(() => {
@@ -66,9 +63,9 @@ export default function EstimationTest() {
           if (currTime >= limit) {
             clearInterval(interval);
             beepSound.current.play();
-            setIsPaused(true);
-            setIsReady(false);
+            setIsRunning(false);
             if (!isTrialInterval) requestUserInput();
+            else setWaitingNonModalInput(true);
             return limit;
           }
           return currTime;
@@ -81,199 +78,108 @@ export default function EstimationTest() {
   }, [
     estimationResults.length,
     estimationSequences,
-    isPaused,
+    isRunning,
     isTrialInterval,
   ]);
 
   const handleStartStop = () => {
     beepSound.current.play();
-    if (!isPaused) setIsReady(false);
-    setIsPaused(!isPaused);
+    if (isRunning) setWaitingNonModalInput(true);
+    setIsRunning(!isRunning);
   };
 
-  const handleReset = () => {
-    setTime(0);
-    setIsReady(true);
-  };
-
-  const handleFirstInterval = () => {
-    setTime(0);
-    setIsTrialInterval(false);
-    setIsReady(true);
-  };
-
-  const StartStopButton = (
+  const startStopButton = (
     <button
       type="button"
       className="btn-start-stop"
       onClick={handleStartStop}
-      disabled={!canStart || modalOpen || isEditable}
+      disabled={limitReached || modalOpen || isEditable}
     >
-      {isPaused ? 'Começar' : 'Parar'}
+      {isRunning ? 'Parar' : 'Começar'}
     </button>
   );
 
-  const ResetButtons = (
+  const acceptTrialInterval = () => {
+    setTime(0);
+    setWaitingNonModalInput(false);
+    setIsTrialInterval(false);
+  };
+
+  const cancelInterval = () => {
+    setTime(0);
+    setWaitingNonModalInput(false);
+  };
+
+  // used when any interval is stopped before reaching the time limit or when trial interval finishes
+  const nonUserInputButtons = (
     <div>
       {isTrialInterval && (
         <button
           type="button"
           className="btn-submit"
-          onClick={handleFirstInterval}
+          onClick={acceptTrialInterval}
           disabled={isEditable}
         >
           Próximo intervalo
         </button>
       )}
+
       <button
         type="button"
         className="btn-cancel"
-        onClick={handleReset}
-        disabled={modalOpen || isEditable}
+        onClick={cancelInterval}
+        disabled={isEditable}
       >
-        Repetir Intervalo
+        Cancelar Intervalo
       </button>
     </div>
   );
 
-  const toggleEditable = () => {
-    if (isEditable) {
-      // resolve empty cells after editing table
-      const isPositiveNumber = (value: any): value is number =>
-        typeof value === 'number' && value > 0;
-      const transformedArray = estimationResults.reduceRight<number[]>(
-        (accumulator, current) => {
-          if (isPositiveNumber(current)) {
-            accumulator.unshift(current);
-          } else if (accumulator.length > 0) {
-            accumulator.unshift(0);
-          }
-          return accumulator;
-        },
-        [],
-      );
-      setResults(transformedArray);
-    }
-    setEditable(!isEditable);
+  const cancelUserInput = () => {
+    setModalOpen(false);
+    setUserInput(null);
+    setTime(0);
   };
 
-  const onEditable = (
-    index: number,
-    event: FormEvent<HTMLTableCellElement>,
-  ) => {
-    const updatedResults = [...estimationResults];
-    const value = event.currentTarget.textContent; // Assuming the content is text only
-    // Attempt to convert the edited content to a number.
-    updatedResults[index] = value ? parseInt(value, 10) : 0; // You may need more complex validation
-    setResults(updatedResults);
+  const saveUserInput = () => {
+    const input = userInput ?? 0;
+    const newResults = [...estimationResults, input];
+    setResults(newResults);
+    cancelUserInput();
   };
-
-  const Table = (
-    <table className="table-results">
-      <tr>
-        <td>Intervalo</td>
-        {estimationSequences.map((_, index) => (
-          <td key={`interval-${index + 1}`}>{index + 1}</td>
-        ))}
-      </tr>
-      <tr>
-        <td>Segundos</td>
-        {estimationSequences.map((sequence, index) => (
-          <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
-        ))}
-      </tr>
-      <tr className="result-row">
-        <td>Resultado</td>
-        {estimationResults.map((result, index) => (
-          <td
-            key={`result-${index + 1}`}
-            contentEditable={isEditable}
-            onInput={(e) => onEditable(index, e)}
-          >
-            {result}
-          </td>
-        ))}
-        {[...Array(9 - estimationResults.length)].map((_, index) => (
-          <td
-            key={`empty-${index + estimationResults.length + 1}`}
-            contentEditable={
-              isEditable &&
-              index + estimationResults.length === estimationResults.length
-            }
-            onInput={(e) => onEditable(index + estimationResults.length, e)}
-          />
-        ))}
-      </tr>
-    </table>
-  );
 
   return (
     <div>
-      <h1 className="title">Teste de Estimação</h1>
-      <h3 className="subtitle">{intervalTitle}</h3>
-
-      <div>
-        {modalOpen && (
-          <div className="modal">
-            <h2 className="subtitle">Colocar resultado</h2>
-            <input
-              type="number"
-              className="input-modal"
-              value={userInput ?? undefined}
-              onChange={(e) => setUserInput(Number(e.target.value))}
-            />
-            <button
-              type="button"
-              className="btn-submit"
-              onClick={() => {
-                if (userInput !== null) {
-                  setModalOpen(false);
-                  const newResults = [...estimationResults, userInput];
-                  setResults(newResults);
-                  setUserInput(null);
-                  setIsReady(true);
-                  setTime(0);
-                }
-              }}
-            >
-              Submeter
-            </button>
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={() => {
-                setModalOpen(false);
-                setUserInput(null);
-                setIsReady(true);
-                setTime(0);
-              }}
-            >
-              Cancelar
-            </button>
-          </div>
-        )}
-      </div>
-
-      <div>{isReady ? StartStopButton : ResetButtons}</div>
+      <h1>Teste de Estimação</h1>
+      <h2>{intervalTitle}</h2>
+      <div>{waitingNonModalInput ? nonUserInputButtons : startStopButton}</div>
       <Timer time={time} />
 
-      <div>{Table}</div>
+      <Table
+        sequences={estimationSequences}
+        results={estimationResults}
+        setResults={setResults}
+        isEditable={isEditable}
+      />
 
-      <button
-        type="button"
-        onClick={goToMainMenu}
-        disabled={!isPaused || isEditable || modalOpen || !isReady}
-      >
-        Voltar
-      </button>
+      <MainMenuButton
+        disabled={isRunning || isEditable || modalOpen || waitingNonModalInput}
+      />
+      <EditResultsButton
+        disabled={isRunning || modalOpen || waitingNonModalInput}
+        isEditable={isEditable}
+        results={estimationResults}
+        setResults={setResults}
+        setEditable={setEditable}
+      />
 
-      <button
-        type="button"
-        onClick={toggleEditable}
-        disabled={!isPaused || modalOpen || !isReady}
-      >
-        {isEditable ? 'Guardar Tabela' : 'Ativar Edição'}
-      </button>
+      <UserInputModal
+        isModalOpen={modalOpen}
+        userInput={userInput}
+        setUserInput={setUserInput}
+        saveUserInput={saveUserInput}
+        cancelUserInput={cancelUserInput}
+      />
     </div>
   );
 }

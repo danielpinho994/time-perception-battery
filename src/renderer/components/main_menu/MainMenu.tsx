@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import {
   useIsClockPaused,
@@ -6,19 +6,22 @@ import {
   useClockModalOpen,
   useIsGlobalPaused,
   useAppContext,
+  usePatientName,
 } from '../AppContext';
 import GlobalTest from './GlobalTest';
 import ClockTest from './ClockTest';
-import ResultsTable from './TableTests';
+import TableTests from './TableTests';
 
 export default function MainMenu() {
+  const [patientName, setPatientName] = usePatientName();
   const [globalModalOpen] = useGlobalModalOpen();
   const [isGlobalPaused] = useIsGlobalPaused();
   const [isClockPaused] = useIsClockPaused();
   const [clockModalOpen] = useClockModalOpen();
   const { resetContext } = useAppContext();
 
-  const [patientName, setPatientName] = useState('');
+  const printRef = useRef(null);
+
   const patientNameDiv = (
     <div>
       <h2 className="subtitle">Nome do paciente</h2>
@@ -32,8 +35,7 @@ export default function MainMenu() {
     </div>
   );
 
-  const printRef = useRef(null);
-  const printResultsButton = (
+  const printButton = (
     <button
       type="button"
       onClick={useReactToPrint({
@@ -64,28 +66,23 @@ export default function MainMenu() {
       <div ref={printRef} className="print-scale">
         <h1 className="title">Testes de Percepção Temporal</h1>
         <div className="level">{patientNameDiv}</div>
-        <div className="level">
-          <GlobalTest />
-        </div>
-        <div className="level">
-          <ResultsTable
-            title="Teste de Estimação"
-            goToPath="/estimation-test"
-          />
-        </div>
-        <div className="level">
-          <ResultsTable title="Teste de Produção" goToPath="/production-test" />
-        </div>
-        <div className="level">
-          <ClockTest />
-        </div>
+        <GlobalTest className="level" />
+        <TableTests
+          title="Teste de Estimação"
+          goToPath="/estimation-test"
+          className="level"
+        />
+        <TableTests
+          title="Teste de Produção"
+          goToPath="/production-test"
+          className="level"
+        />
+        <ClockTest className="level" />
       </div>
-      <div>
-        <div className="subtitle" />
-        <div className="level">{printResultsButton}</div>
-        <div className="subtitle" />
-        <div className="level">{resetButton}</div>
-      </div>
+
+      <h2 className="black-tab"> _ </h2>
+      <div className="level">{printButton}</div>
+      <div className="level">{resetButton}</div>
     </>
   );
 }
