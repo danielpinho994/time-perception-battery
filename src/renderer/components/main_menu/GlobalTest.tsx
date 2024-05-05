@@ -76,11 +76,7 @@ export default function GlobalTest() {
       <div className="result">
         {globalResults[1] === 0
           ? ''
-          : `Resultado: ${`0${Math.floor(
-              (globalResults[1] / 60000) % 60,
-            )}`.slice(-2)} : ${`0${Math.floor(
-              (globalResults[1] / 1000) % 60,
-            )}`.slice(-2)}` ?? ''}
+          : `Resultado: ${globalResults[1]} minutos` ?? ''}
       </div>
     </div>
   );
@@ -88,7 +84,6 @@ export default function GlobalTest() {
   const editResultButton = (
     <button
       type="button"
-      className="btn-change"
       onClick={requestUserInput}
       disabled={
         globalModalOpen || clockModalOpen || !isGlobalPaused || !isClockPaused
@@ -105,7 +100,7 @@ export default function GlobalTest() {
           <h2 className="subtitle">Colocar resultado em minutos</h2>
           <input
             type="number"
-            className="result"
+            className="input-modal"
             value={userInput ?? undefined} // Handle controlled to uncontrolled warning
             onChange={(e) => setUserInput(Number(e.target.value))}
           />
@@ -115,7 +110,7 @@ export default function GlobalTest() {
             onClick={() => {
               if (userInput !== null) {
                 setGlobalModalOpen(false);
-                setResults([time, userInput * 1000 * 60]);
+                setResults([time, userInput]);
                 setUserInput(null);
               }
             }}
@@ -124,7 +119,7 @@ export default function GlobalTest() {
           </button>
           <button
             type="button"
-            className="btn-submit"
+            className="btn-cancel"
             onClick={() => setGlobalModalOpen(false)}
           >
             Cancelar

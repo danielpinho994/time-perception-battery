@@ -23,7 +23,7 @@ export default function MainMenu() {
     <div>
       <h2 className="subtitle">Nome do paciente</h2>
       <input
-        className="name-input"
+        className="input"
         type="text"
         value={patientName}
         onChange={(e) => setPatientName(e.target.value)}
@@ -34,35 +34,29 @@ export default function MainMenu() {
 
   const printRef = useRef(null);
   const printResultsButton = (
-    <div className="footer-buttons">
-      <button
-        type="button"
-        className="btn-footer"
-        onClick={useReactToPrint({
-          content: () => printRef.current,
-        })}
-        disabled={
-          globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
-        }
-      >
-        Imprimir Resultados
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={useReactToPrint({
+        content: () => printRef.current,
+      })}
+      disabled={
+        globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
+      }
+    >
+      Imprimir Resultados
+    </button>
   );
 
   const resetButton = (
-    <div className="footer-buttons">
-      <button
-        type="button"
-        className="btn-footer"
-        onClick={resetContext}
-        disabled={
-          globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
-        }
-      >
-        Gerar novo teste
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={resetContext}
+      disabled={
+        globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
+      }
+    >
+      Gerar novo teste
+    </button>
   );
 
   return (

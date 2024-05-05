@@ -74,17 +74,12 @@ export default function Clock() {
       <div className="result">
         {clockResults[1] === 0
           ? ''
-          : `Resultado: ${`0${Math.floor(
-              (clockResults[1] / 60000) % 60,
-            )}`.slice(-2)} : ${`0${Math.floor(
-              (clockResults[1] / 1000) % 60,
-            )}`.slice(-2)}` ?? ''}
+          : `Resultado: ${clockResults[1]} segundos` ?? ''}
       </div>
 
       <div>
         <button
           type="button"
-          className="btn-change"
           onClick={requestUserInput}
           disabled={globalModalOpen || clockModalOpen || !isClockPaused}
         >
@@ -98,7 +93,7 @@ export default function Clock() {
             <h2 className="subtitle">Colocar resultado em segundos</h2>
             <input
               type="number"
-              className="result"
+              className="input-modal"
               value={userInput ?? undefined} // Handle controlled to uncontrolled warning
               onChange={(e) => setUserInput(Number(e.target.value))}
             />
@@ -107,7 +102,7 @@ export default function Clock() {
               className="btn-submit"
               onClick={() => {
                 if (userInput !== null) {
-                  setResults([time, userInput * 1000]);
+                  setResults([time, userInput]);
                   setClockModalOpen(false);
                   setUserInput(null);
                 }
@@ -117,7 +112,7 @@ export default function Clock() {
             </button>
             <button
               type="button"
-              className="btn-submit"
+              className="btn-cancel"
               onClick={() => setClockModalOpen(false)}
             >
               Cancelar

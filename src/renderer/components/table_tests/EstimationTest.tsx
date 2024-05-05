@@ -118,7 +118,7 @@ export default function EstimationTest() {
       {isTrialInterval && (
         <button
           type="button"
-          className="btn btn-two"
+          className="btn-submit"
           onClick={handleFirstInterval}
           disabled={isEditable}
         >
@@ -127,7 +127,7 @@ export default function EstimationTest() {
       )}
       <button
         type="button"
-        className="btn btn-two"
+        className="btn-cancel"
         onClick={handleReset}
         disabled={modalOpen || isEditable}
       >
@@ -182,7 +182,7 @@ export default function EstimationTest() {
           <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
         ))}
       </tr>
-      <tr>
+      <tr className="result-row">
         <td>Resultado</td>
         {estimationResults.map((result, index) => (
           <td
@@ -209,20 +209,22 @@ export default function EstimationTest() {
 
   return (
     <div>
-      <h1>Teste de Estimação</h1>
-      <h3>{intervalTitle}</h3>
+      <h1 className="title">Teste de Estimação</h1>
+      <h3 className="subtitle">{intervalTitle}</h3>
 
       <div>
         {modalOpen && (
           <div className="modal">
-            <h2>Colocar resultado</h2>
+            <h2 className="subtitle">Colocar resultado</h2>
             <input
               type="number"
+              className="input-modal"
               value={userInput ?? undefined}
               onChange={(e) => setUserInput(Number(e.target.value))}
             />
             <button
               type="button"
+              className="btn-submit"
               onClick={() => {
                 if (userInput !== null) {
                   setModalOpen(false);
@@ -238,7 +240,7 @@ export default function EstimationTest() {
             </button>
             <button
               type="button"
-              className="btn-submit"
+              className="btn-cancel"
               onClick={() => {
                 setModalOpen(false);
                 setUserInput(null);

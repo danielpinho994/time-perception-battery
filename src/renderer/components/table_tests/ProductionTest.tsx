@@ -83,7 +83,7 @@ export default function ProductionTest() {
   const StartStopButton = (
     <button
       type="button"
-      className="btn btn-one btn-start"
+      className="btn-start-stop"
       onClick={handleStartStop}
       disabled={!canStart || isEditable}
     >
@@ -95,7 +95,7 @@ export default function ProductionTest() {
     <div>
       <button
         type="button"
-        className="btn btn-one"
+        className="btn-submit"
         onClick={handleSave}
         disabled={isEditable}
       >
@@ -103,7 +103,7 @@ export default function ProductionTest() {
       </button>
       <button
         type="button"
-        className="btn btn-two"
+        className="btn-cancel"
         onClick={handleReset}
         disabled={isEditable}
       >
@@ -158,7 +158,7 @@ export default function ProductionTest() {
           <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
         ))}
       </tr>
-      <tr>
+      <tr className="result-row">
         <td>Resultado</td>
         {productionResults.map((result, index) => (
           <td
@@ -185,8 +185,8 @@ export default function ProductionTest() {
 
   return (
     <div>
-      <h1>Teste de Produção</h1>
-      <h3>{intervalTitle}</h3>
+      <h1 className="title">Teste de Produção</h1>
+      <h3 className="subtitle">{intervalTitle}</h3>
 
       <div>{isReady ? StartStopButton : ResetButtons}</div>
       <Timer time={time} />
