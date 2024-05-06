@@ -7,6 +7,7 @@ import {
   useClockModalOpen,
 } from '../AppContext';
 import ResultInputModal from '../common/ResultInputModal';
+import SingleClockResults from './SingleClockResults';
 
 export default function ClockTest() {
   const [globalModalOpen] = useGlobalModalOpen();
@@ -34,7 +35,7 @@ export default function ClockTest() {
   }, [isClockRunning]);
 
   const handleStartStop = () => {
-    if (!isClockRunning) {
+    if (isClockRunning) {
       setClockModalOpen(true);
     }
     setIsClockRunning(!isClockRunning);
@@ -57,34 +58,19 @@ export default function ClockTest() {
         time={time}
       />
 
-      <div className="result">
-        {clockResults[0] === 0
-          ? ''
-          : `Tempo decorrido: ${`0${Math.floor(
-              (clockResults[0] / 60000) % 60,
-            )}`.slice(-2)}:${`0${Math.floor(
-              (clockResults[0] / 1000) % 60,
-            )}`.slice(-2)}` ?? ''}
-      </div>
-      <div className="result">
-        {clockResults[1] === 0
-          ? ''
-          : `Resultado: ${clockResults[1]} segundos` ?? ''}
-      </div>
-
-      <button
-        type="button"
-        onClick={async () => setClockModalOpen(true)}
-        disabled={globalModalOpen || clockModalOpen || isClockRunning}
-      >
-        Alterar Resultado
-      </button>
+      <SingleClockResults
+        results={clockResults}
+        timeUnitString="segundos"
+        setModalOpen={setClockModalOpen}
+        editButtonDisabled={globalModalOpen || clockModalOpen || isClockRunning}
+      />
 
       <ResultInputModal
         isModalOpen={clockModalOpen}
         setModalOpen={setClockModalOpen}
         setTime={setTime}
         saveResult={saveResult}
+        timeUnitString="segundos"
       />
     </div>
   );

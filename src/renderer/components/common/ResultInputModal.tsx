@@ -5,6 +5,7 @@ export default function ResultInputModal({
   setModalOpen,
   setTime,
   saveResult,
+  timeUnitString,
 }) {
   const [userInput, setUserInput] = useState<number | null>(null);
 
@@ -23,7 +24,7 @@ export default function ResultInputModal({
     <div>
       {isModalOpen && (
         <div className="modal">
-          <h2 className="subtitle">Colocar resultado em minutos</h2>
+          <h2 className="subtitle">Colocar resultado em {timeUnitString}</h2>
           <input
             type="number"
             className="input-modal"
@@ -31,11 +32,7 @@ export default function ResultInputModal({
             onChange={(e) => setUserInput(Number(e.target.value))}
           />
 
-          <button
-            type="button"
-            className="btn-submit"
-            onClick={() => saveUserInput()}
-          >
+          <button type="button" className="btn-submit" onClick={saveUserInput}>
             Submeter
           </button>
           <button

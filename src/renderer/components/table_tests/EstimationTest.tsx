@@ -161,6 +161,7 @@ export default function EstimationTest() {
         setModalOpen={setModalOpen}
         setTime={setTime}
         saveResult={saveResult}
+        timeUnitString="segundos"
       />
     </div>
   );

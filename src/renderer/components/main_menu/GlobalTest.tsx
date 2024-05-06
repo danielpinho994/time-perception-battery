@@ -9,6 +9,8 @@ import {
 } from '../AppContext';
 import StopWatch from '../common/StopWatch';
 import ResultInputModal from '../common/ResultInputModal';
+import SingleClockResults from './SingleClockResults';
+import InstructionsModal from '../common/InstructionsModal';
 
 export default function GlobalTest() {
   const [globalStartTime, setStartTime] = useGlobalStartTime();
@@ -47,39 +49,6 @@ export default function GlobalTest() {
     setIsGlobalRunning(!isGlobalRunning);
   };
 
-  const resultDiv = (
-    <div>
-      <div className="result">
-        {globalResults[0] === 0
-          ? ''
-          : `Tempo decorrido: ${`0${Math.floor(
-              (globalResults[0] / 60000) % 60,
-            )}`.slice(-2)}:${`0${Math.floor(
-              (globalResults[0] / 1000) % 60,
-            )}`.slice(-2)}` ?? ''}
-      </div>
-      <div className="result">
-        {globalResults[1] === 0
-          ? ''
-          : `Resultado: ${globalResults[1]} ${
-              globalResults[1] === 1 ? 'minuto' : 'minutos'
-            }` ?? ''}
-      </div>
-    </div>
-  );
-
-  const editResultButton = (
-    <button
-      type="button"
-      onClick={async () => setGlobalModalOpen(true)}
-      disabled={
-        globalModalOpen || clockModalOpen || isGlobalRunning || isClockRunning
-      }
-    >
-      Alterar Resultado
-    </button>
-  );
-
   const saveResult = (input: number) => {
     setResults([time === 0 ? globalResults[0] : time, input]);
   };
@@ -87,6 +56,13 @@ export default function GlobalTest() {
   return (
     <div className="level">
       <h2>Teste Global</h2>
+
+      <InstructionsModal
+        instructionsString="No teste global pretende-se avaliar a percepção temporal a uma
+            escala mais ampla, ao medir o tempo total de duração do conjunto de
+            todos os testes. Antes de iniciar o teste, o paciente deve ser
+            avisado de que o teste irá começar."
+      />
 
       <StopWatch
         handleStartStop={handleStartStop}
@@ -96,15 +72,20 @@ export default function GlobalTest() {
         resetButtons={null}
         time={time}
       />
-
-      <div>{resultDiv}</div>
-      <div>{editResultButton}</div>
-
+      <SingleClockResults
+        results={globalResults}
+        timeUnitString="minutos"
+        setModalOpen={setGlobalModalOpen}
+        editButtonDisabled={
+          globalModalOpen || clockModalOpen || isGlobalRunning || isClockRunning
+        }
+      />
       <ResultInputModal
         isModalOpen={globalModalOpen}
         setModalOpen={setGlobalModalOpen}
         setTime={setTime}
         saveResult={saveResult}
+        timeUnitString="minutos"
       />
     </div>
   );

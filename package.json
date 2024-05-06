@@ -148,7 +148,7 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "TimePerceptionBattery",
+    "productName": "TestesDePercepçãoTemporal",
     "appId": "org.dp.TimePerceptionBattery",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
