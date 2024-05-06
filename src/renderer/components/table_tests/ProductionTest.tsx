@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import beepFile from '../../../../assets/beep.wav';
-import Timer from '../common/Timer';
+import StopWatch from '../common/StopWatch';
 import { useProductionResults, useProductionSequences } from '../AppContext';
 import Table from '../common/Table';
-import { MainMenuButton, EditResultsButton } from './CommonButtons';
+import { MainMenuButton, EditResultsButton } from '../common/CommonButtons';
 
 export default function ProductionTest() {
   const [productionSequences] = useProductionSequences();
   const [productionResults, setResults] = useProductionResults();
 
-  const [isReady, setIsReady] = useState(true);
+  const [waitingTimerReset, setWaitingTimerReset] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
   const [isEditable, setEditable] = useState(false);
@@ -56,24 +56,13 @@ export default function ProductionTest() {
 
   const handleStartStop = () => {
     beepSound.current.play();
-    if (isRunning) setIsReady(true);
+    if (isRunning) setWaitingTimerReset(true);
     setIsRunning(!isRunning);
   };
 
-  const startStopButton = (
-    <button
-      type="button"
-      className="btn-start-stop"
-      onClick={handleStartStop}
-      disabled={limitReached || isEditable}
-    >
-      {isRunning ? 'Parar' : 'Começar'}
-    </button>
-  );
-
   const handleReset = () => {
     setTime(0);
-    setIsReady(true);
+    setWaitingTimerReset(false);
   };
 
   const handleSave = () => {
@@ -83,7 +72,7 @@ export default function ProductionTest() {
       const newResults = [...productionResults, Math.floor(time / 1000)];
       setResults(newResults);
     }
-    setIsReady(true);
+    setWaitingTimerReset(false);
   };
 
   const resetButtons = (
@@ -112,8 +101,15 @@ export default function ProductionTest() {
     <div>
       <h1>Teste de Produção</h1>
       <h2>{intervalTitle}</h2>
-      <div>{isReady ? startStopButton : resetButtons}</div>
-      <Timer time={time} />
+
+      <StopWatch
+        handleStartStop={handleStartStop}
+        buttonDisabled={limitReached || isEditable}
+        isRunning={isRunning}
+        isReset={waitingTimerReset}
+        resetButtons={resetButtons}
+        time={time}
+      />
 
       <Table
         sequences={productionSequences}
@@ -122,9 +118,9 @@ export default function ProductionTest() {
         isEditable={isEditable}
       />
 
-      <MainMenuButton disabled={isRunning || isEditable || !isReady} />
+      <MainMenuButton disabled={isRunning || isEditable || waitingTimerReset} />
       <EditResultsButton
-        disabled={isRunning || !isReady}
+        disabled={isRunning || waitingTimerReset}
         isEditable={isEditable}
         results={productionResults}
         setResults={setResults}

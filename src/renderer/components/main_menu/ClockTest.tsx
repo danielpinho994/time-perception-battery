@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Timer from '../common/Timer';
+import StopWatch from '../common/StopWatch';
 import {
   useClockResults,
   useIsClockRunning,
@@ -40,17 +40,6 @@ export default function ClockTest() {
     setIsClockRunning(!isClockRunning);
   };
 
-  const startStopButton = (
-    <button
-      type="button"
-      className="btn-start-stop"
-      onClick={handleStartStop}
-      disabled={globalModalOpen || clockModalOpen}
-    >
-      {isClockRunning ? 'Começar' : 'Parar'}
-    </button>
-  );
-
   const saveResult = (input: number) => {
     setResults([time === 0 ? clockResults[0] : time, input]);
   };
@@ -58,8 +47,15 @@ export default function ClockTest() {
   return (
     <div className="level">
       <h2>Teste do Relógio </h2>
-      <div>{startStopButton}</div>
-      <Timer time={time} />
+
+      <StopWatch
+        handleStartStop={handleStartStop}
+        buttonDisabled={globalModalOpen || clockModalOpen}
+        isRunning={isClockRunning}
+        isReset={false}
+        resetButtons={null}
+        time={time}
+      />
 
       <div className="result">
         {clockResults[0] === 0

@@ -2,10 +2,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useEstimationSequences, useEstimationResults } from '../AppContext';
 import beepFile from '../../../../assets/beep.wav';
-import Timer from '../common/Timer';
+import StopWatch from '../common/StopWatch';
 import Table from '../common/Table';
 import ResultInputModal from '../common/ResultInputModal';
-import { MainMenuButton, EditResultsButton } from './CommonButtons';
+import { MainMenuButton, EditResultsButton } from '../common/CommonButtons';
 
 export default function EstimationTest() {
   const [estimationSequences] = useEstimationSequences();
@@ -84,17 +84,6 @@ export default function EstimationTest() {
     setIsRunning(!isRunning);
   };
 
-  const startStopButton = (
-    <button
-      type="button"
-      className="btn-start-stop"
-      onClick={handleStartStop}
-      disabled={limitReached || modalOpen || isEditable}
-    >
-      {isRunning ? 'Parar' : 'Começar'}
-    </button>
-  );
-
   const cancelInterval = () => {
     setTime(0);
     setWaitingNonModalInput(false);
@@ -140,8 +129,14 @@ export default function EstimationTest() {
     <div>
       <h1>Teste de Estimação</h1>
       <h2>{intervalTitle}</h2>
-      <div>{waitingNonModalInput ? nonUserInputButtons : startStopButton}</div>
-      <Timer time={time} />
+      <StopWatch
+        handleStartStop={handleStartStop}
+        buttonDisabled={limitReached || modalOpen || isEditable}
+        isRunning={isRunning}
+        isReset={waitingNonModalInput}
+        resetButtons={nonUserInputButtons}
+        time={time}
+      />
 
       <Table
         sequences={estimationSequences}

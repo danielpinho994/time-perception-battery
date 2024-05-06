@@ -7,7 +7,7 @@ import {
   useClockModalOpen,
   useIsGlobalRunning,
 } from '../AppContext';
-import Timer from '../common/Timer';
+import StopWatch from '../common/StopWatch';
 import ResultInputModal from '../common/ResultInputModal';
 
 export default function GlobalTest() {
@@ -46,17 +46,6 @@ export default function GlobalTest() {
     }
     setIsGlobalRunning(!isGlobalRunning);
   };
-
-  const startStopButton = (
-    <button
-      type="button"
-      className="btn-start-stop"
-      onClick={handleStartStop}
-      disabled={globalModalOpen || clockModalOpen || isClockRunning}
-    >
-      {isGlobalRunning ? 'Parar' : 'Começar'}
-    </button>
-  );
 
   const resultDiv = (
     <div>
@@ -98,8 +87,16 @@ export default function GlobalTest() {
   return (
     <div className="level">
       <h2>Teste Global</h2>
-      <div>{startStopButton}</div>
-      <Timer time={time} />
+
+      <StopWatch
+        handleStartStop={handleStartStop}
+        buttonDisabled={globalModalOpen || clockModalOpen || isClockRunning}
+        isRunning={isGlobalRunning}
+        isReset={false}
+        resetButtons={null}
+        time={time}
+      />
+
       <div>{resultDiv}</div>
       <div>{editResultButton}</div>
 

@@ -1,5 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 
+export function StartStopButton({
+  handleStartStop,
+  disabled,
+  isRunning,
+  isReset,
+  resetButtons,
+}) {
+  const startStopButton = (
+    <button
+      type="button"
+      className="btn-start-stop"
+      onClick={handleStartStop}
+      disabled={disabled}
+    >
+      {isRunning ? 'Parar' : 'Começar'}
+    </button>
+  );
+
+  return <div>{isReset ? resetButtons : startStopButton}</div>;
+}
+
 export function MainMenuButton({ disabled }) {
   const navigate = useNavigate();
   const goToMainMenu = () => {
