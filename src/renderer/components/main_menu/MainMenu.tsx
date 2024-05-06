@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import {
-  useIsClockPaused,
+  useIsClockRunning,
   useGlobalModalOpen,
   useClockModalOpen,
-  useIsGlobalPaused,
+  useIsGlobalRunning,
   useAppContext,
   usePatientName,
 } from '../AppContext';
@@ -15,8 +15,8 @@ import TableTests from './TableTests';
 export default function MainMenu() {
   const [patientName, setPatientName] = usePatientName();
   const [globalModalOpen] = useGlobalModalOpen();
-  const [isGlobalPaused] = useIsGlobalPaused();
-  const [isClockPaused] = useIsClockPaused();
+  const [isGlobalRunning] = useIsGlobalRunning();
+  const [isClockRunning] = useIsClockRunning();
   const [clockModalOpen] = useClockModalOpen();
   const { resetContext } = useAppContext();
 
@@ -30,7 +30,7 @@ export default function MainMenu() {
         type="text"
         value={patientName}
         onChange={(e) => setPatientName(e.target.value)}
-        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
+        disabled={globalModalOpen || clockModalOpen || isClockRunning}
       />
     </div>
   );
@@ -42,7 +42,7 @@ export default function MainMenu() {
         content: () => printRef.current,
       })}
       disabled={
-        globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
+        globalModalOpen || clockModalOpen || isClockRunning || isGlobalRunning
       }
     >
       Imprimir Resultados
@@ -54,7 +54,7 @@ export default function MainMenu() {
       type="button"
       onClick={resetContext}
       disabled={
-        globalModalOpen || clockModalOpen || !isClockPaused || !isGlobalPaused
+        globalModalOpen || clockModalOpen || isClockRunning || isGlobalRunning
       }
     >
       Gerar novo teste
@@ -66,18 +66,10 @@ export default function MainMenu() {
       <div ref={printRef} className="print-scale">
         <h1 className="title">Testes de Percepção Temporal</h1>
         <div className="level">{patientNameDiv}</div>
-        <GlobalTest className="level" />
-        <TableTests
-          title="Teste de Estimação"
-          goToPath="/estimation-test"
-          className="level"
-        />
-        <TableTests
-          title="Teste de Produção"
-          goToPath="/production-test"
-          className="level"
-        />
-        <ClockTest className="level" />
+        <GlobalTest />
+        <TableTests title="Teste de Estimação" goToPath="/estimation-test" />
+        <TableTests title="Teste de Produção" goToPath="/production-test" />
+        <ClockTest />
       </div>
 
       <h2 className="black-tab"> _ </h2>

@@ -4,63 +4,44 @@ import {
   useEstimationResults,
   useProductionSequences,
   useProductionResults,
-  useIsClockPaused,
+  useIsClockRunning,
   useClockModalOpen,
   useGlobalModalOpen,
 } from '../AppContext';
+import Table from '../common/Table';
 
-export default function TableTests({ title, goToPath, className }) {
+export default function TableTests({ title, goToPath }) {
   const navigate = useNavigate();
   const [globalModalOpen] = useGlobalModalOpen();
-  const [isClockPaused] = useIsClockPaused();
+  const [isClockRunning] = useIsClockRunning();
   const [clockModalOpen] = useClockModalOpen();
 
-  const [sequences] =
+  const [[sequences], [results]] =
     title === 'Teste de Estimação'
-      ? useEstimationSequences()
-      : useProductionSequences();
-  const [results] =
-    title === 'Teste de Estimação'
-      ? useEstimationResults()
-      : useProductionResults();
+      ? [useEstimationSequences(), useEstimationResults()]
+      : [useProductionSequences(), useProductionResults()];
 
-  const goToTest = (testRoute: string) => {
-    navigate(testRoute);
-  };
+  const goToTestButton = (
+    <button
+      type="button"
+      onClick={() => navigate(goToPath)}
+      disabled={globalModalOpen || clockModalOpen || isClockRunning}
+    >
+      Ir para teste
+    </button>
+  );
 
   return (
-    <div className={className}>
+    <div className="level">
       <h2>{title}</h2>
-      <button
-        type="button"
-        onClick={() => goToTest(goToPath)}
-        disabled={globalModalOpen || clockModalOpen || !isClockPaused}
-      >
-        Ir para teste
-      </button>
-      <table>
-        <tr>
-          <td>Intervalo</td>
-          {sequences.map((_, index) => (
-            <td key={`interval-${index + 1}`}>{index + 1}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>Segundos</td>
-          {sequences.map((sequence, index) => (
-            <td key={`seconds-${index + 1}`}>{sequence / 1000}</td>
-          ))}
-        </tr>
-        <tr className="table-results-row">
-          <td>Resultado</td>
-          {results.map((result, index) => (
-            <td key={`result-${index + 1}`}>{result}</td>
-          ))}
-          {[...Array(9 - results.length)].map((_, index) => (
-            <td key={`empty-${index + results.length + 1}`} />
-          ))}
-        </tr>
-      </table>
+      <div>{goToTestButton}</div>
+
+      <Table
+        sequences={sequences}
+        results={results}
+        setResults={null}
+        isEditable={false}
+      />
     </div>
   );
 }

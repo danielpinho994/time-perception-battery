@@ -1,10 +1,24 @@
-export default function UserInputModal({
+import { useState } from 'react';
+
+export default function ResultInputModal({
   isModalOpen,
-  userInput,
-  setUserInput,
-  saveUserInput,
-  cancelUserInput,
+  setModalOpen,
+  setTime,
+  saveResult,
 }) {
+  const [userInput, setUserInput] = useState<number | null>(null);
+
+  const cancelUserInput = () => {
+    setModalOpen(false);
+    setUserInput(null);
+    setTime(0);
+  };
+
+  const saveUserInput = () => {
+    saveResult(userInput ?? 0);
+    cancelUserInput();
+  };
+
   return (
     <div>
       {isModalOpen && (
@@ -13,11 +27,15 @@ export default function UserInputModal({
           <input
             type="number"
             className="input-modal"
-            value={userInput ?? undefined} // Handle controlled to uncontrolled warning
+            value={userInput ?? undefined}
             onChange={(e) => setUserInput(Number(e.target.value))}
           />
 
-          <button type="button" className="btn-submit" onClick={saveUserInput}>
+          <button
+            type="button"
+            className="btn-submit"
+            onClick={() => saveUserInput()}
+          >
             Submeter
           </button>
           <button

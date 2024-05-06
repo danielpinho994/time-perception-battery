@@ -2,26 +2,24 @@ import { useState, useEffect } from 'react';
 import Timer from '../common/Timer';
 import {
   useClockResults,
-  useIsClockPaused,
+  useIsClockRunning,
   useGlobalModalOpen,
   useClockModalOpen,
 } from '../AppContext';
-import UserInputModal from '../common/UserInputModal';
+import ResultInputModal from '../common/ResultInputModal';
 
-export default function Clock({ className }) {
+export default function ClockTest() {
   const [globalModalOpen] = useGlobalModalOpen();
   const [clockResults, setResults] = useClockResults();
-  const [isClockPaused, setIsClockPaused] = useIsClockPaused();
+  const [isClockRunning, setIsClockRunning] = useIsClockRunning();
   const [clockModalOpen, setClockModalOpen] = useClockModalOpen();
 
   const [time, setTime] = useState(0);
-  const [userInput, setUserInput] = useState<number | null>(null);
 
   // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    if (!isClockPaused) {
-      // start stop watch
+    if (isClockRunning) {
       const startTime = performance.now();
       interval = setInterval(() => {
         setTime(performance.now() - startTime);
@@ -33,13 +31,13 @@ export default function Clock({ className }) {
     return () => {
       clearInterval(interval);
     };
-  }, [isClockPaused]);
+  }, [isClockRunning]);
 
   const handleStartStop = () => {
-    if (!isClockPaused) {
-      requestUserInput();
+    if (!isClockRunning) {
+      setClockModalOpen(true);
     }
-    setIsClockPaused(!isClockPaused);
+    setIsClockRunning(!isClockRunning);
   };
 
   const startStopButton = (
@@ -49,24 +47,16 @@ export default function Clock({ className }) {
       onClick={handleStartStop}
       disabled={globalModalOpen || clockModalOpen}
     >
-      {isClockPaused ? 'Começar' : 'Parar'}
+      {isClockRunning ? 'Começar' : 'Parar'}
     </button>
   );
 
-  const cancelUserInput = () => {
-    setClockModalOpen(false);
-    setUserInput(null);
-    setTime(0);
-  };
-
-  const saveUserInput = () => {
-    const input = userInput ?? 0;
+  const saveResult = (input: number) => {
     setResults([time === 0 ? clockResults[0] : time, input]);
-    cancelUserInput();
   };
 
   return (
-    <div className={className}>
+    <div className="level">
       <h2>Teste do Relógio </h2>
       <div>{startStopButton}</div>
       <Timer time={time} />
@@ -86,22 +76,19 @@ export default function Clock({ className }) {
           : `Resultado: ${clockResults[1]} segundos` ?? ''}
       </div>
 
-      <div>
-        <button
-          type="button"
-          onClick={async () => setClockModalOpen(true)}
-          disabled={globalModalOpen || clockModalOpen || !isClockPaused}
-        >
-          Alterar Resultado
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={async () => setClockModalOpen(true)}
+        disabled={globalModalOpen || clockModalOpen || isClockRunning}
+      >
+        Alterar Resultado
+      </button>
 
-      <UserInputModal
+      <ResultInputModal
         isModalOpen={clockModalOpen}
-        userInput={userInput}
-        setUserInput={setUserInput}
-        saveUserInput={saveUserInput}
-        cancelUserInput={cancelUserInput}
+        setModalOpen={setClockModalOpen}
+        setTime={setTime}
+        saveResult={saveResult}
       />
     </div>
   );

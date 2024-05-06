@@ -12,13 +12,13 @@ interface IAppContextData {
   globalStartTime: number;
   globalResults: [number, number];
   globalModalOpen: boolean;
-  isGlobalPaused: boolean;
+  isGlobalRunning: boolean;
   estimationSequences: number[];
   estimationResults: number[];
   productionSequences: number[];
   productionResults: number[];
   clockResults: [number, number];
-  isClockPaused: boolean;
+  isClockRunning: boolean;
   clockModalOpen: boolean;
 }
 
@@ -43,13 +43,13 @@ const defaultContextData = () => ({
   globalStartTime: 0,
   globalResults: [0, 0],
   globalModalOpen: false,
-  isGlobalPaused: true,
+  isGlobalRunning: false,
   estimationSequences: generateSequences(),
   estimationResults: [],
   productionSequences: generateSequences(),
   productionResults: [],
   clockResults: [0, 0],
-  isClockPaused: true,
+  isClockRunning: false,
   clockModalOpen: false,
 });
 
@@ -104,7 +104,7 @@ export const usePatientName = createUseContextState('patientName');
 export const useGlobalStartTime = createUseContextState('globalStartTime');
 export const useGlobalResults = createUseContextState('globalResults');
 export const useGlobalModalOpen = createUseContextState('globalModalOpen');
-export const useIsGlobalPaused = createUseContextState('isGlobalPaused');
+export const useIsGlobalRunning = createUseContextState('isGlobalRunning');
 export const useEstimationSequences = createUseContextState(
   'estimationSequences',
 );
@@ -114,5 +114,5 @@ export const useProductionSequences = createUseContextState(
 );
 export const useProductionResults = createUseContextState('productionResults');
 export const useClockResults = createUseContextState('clockResults');
-export const useIsClockPaused = createUseContextState('isClockPaused');
+export const useIsClockRunning = createUseContextState('isClockRunning');
 export const useClockModalOpen = createUseContextState('clockModalOpen');

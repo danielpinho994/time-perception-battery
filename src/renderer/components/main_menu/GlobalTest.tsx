@@ -3,33 +3,28 @@ import {
   useGlobalStartTime,
   useGlobalResults,
   useGlobalModalOpen,
-  useIsClockPaused,
+  useIsClockRunning,
   useClockModalOpen,
-  useIsGlobalPaused,
+  useIsGlobalRunning,
 } from '../AppContext';
 import Timer from '../common/Timer';
-import UserInputModal from '../common/UserInputModal';
+import ResultInputModal from '../common/ResultInputModal';
 
-export default function GlobalTest({ className }) {
+export default function GlobalTest() {
   const [globalStartTime, setStartTime] = useGlobalStartTime();
   const [globalResults, setResults] = useGlobalResults();
   const [globalModalOpen, setGlobalModalOpen] = useGlobalModalOpen();
-  const [isGlobalPaused, setIsGlobalPaused] = useIsGlobalPaused();
-  const [isClockPaused] = useIsClockPaused();
+  const [isGlobalRunning, setIsGlobalRunning] = useIsGlobalRunning();
+  const [isClockRunning] = useIsClockRunning();
   const [clockModalOpen] = useClockModalOpen();
 
   const [time, setTime] = useState(0);
-  const [userInput, setUserInput] = useState<number | null>(null);
-
-  const requestUserInput = async () => {
-    setGlobalModalOpen(true);
-  };
 
   // stopwatch
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
-    if (!isGlobalPaused) {
+    if (isGlobalRunning) {
       if (globalStartTime === 0) {
         setStartTime(performance.now());
       }
@@ -42,14 +37,14 @@ export default function GlobalTest({ className }) {
     return () => {
       clearInterval(interval);
     };
-  }, [globalStartTime, isGlobalPaused, setStartTime]);
+  }, [globalStartTime, isGlobalRunning, setStartTime]);
 
   const handleStartStop = () => {
-    if (!isGlobalPaused) {
-      requestUserInput();
+    if (isGlobalRunning) {
+      setGlobalModalOpen(true);
       setStartTime(0);
     }
-    setIsGlobalPaused(!isGlobalPaused);
+    setIsGlobalRunning(!isGlobalRunning);
   };
 
   const startStopButton = (
@@ -57,9 +52,9 @@ export default function GlobalTest({ className }) {
       type="button"
       className="btn-start-stop"
       onClick={handleStartStop}
-      disabled={globalModalOpen || clockModalOpen || !isClockPaused}
+      disabled={globalModalOpen || clockModalOpen || isClockRunning}
     >
-      {isGlobalPaused ? 'Começar' : 'Parar'}
+      {isGlobalRunning ? 'Parar' : 'Começar'}
     </button>
   );
 
@@ -89,38 +84,30 @@ export default function GlobalTest({ className }) {
       type="button"
       onClick={async () => setGlobalModalOpen(true)}
       disabled={
-        globalModalOpen || clockModalOpen || !isGlobalPaused || !isClockPaused
+        globalModalOpen || clockModalOpen || isGlobalRunning || isClockRunning
       }
     >
       Alterar Resultado
     </button>
   );
 
-  const cancelUserInput = () => {
-    setGlobalModalOpen(false);
-    setUserInput(null);
-    setTime(0);
-  };
-
-  const saveUserInput = () => {
-    const input = userInput ?? 0;
+  const saveResult = (input: number) => {
     setResults([time === 0 ? globalResults[0] : time, input]);
-    cancelUserInput();
   };
 
   return (
-    <div className={className}>
+    <div className="level">
       <h2>Teste Global</h2>
       <div>{startStopButton}</div>
       <Timer time={time} />
       <div>{resultDiv}</div>
       <div>{editResultButton}</div>
-      <UserInputModal
+
+      <ResultInputModal
         isModalOpen={globalModalOpen}
-        userInput={userInput}
-        setUserInput={setUserInput}
-        saveUserInput={saveUserInput}
-        cancelUserInput={cancelUserInput}
+        setModalOpen={setGlobalModalOpen}
+        setTime={setTime}
+        saveResult={saveResult}
       />
     </div>
   );

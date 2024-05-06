@@ -3,8 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useEstimationSequences, useEstimationResults } from '../AppContext';
 import beepFile from '../../../../assets/beep.wav';
 import Timer from '../common/Timer';
-import Table, { MainMenuButton, EditResultsButton } from './CommonTableTests';
-import UserInputModal from '../common/UserInputModal';
+import Table from '../common/Table';
+import ResultInputModal from '../common/ResultInputModal';
+import { MainMenuButton, EditResultsButton } from './CommonButtons';
 
 export default function EstimationTest() {
   const [estimationSequences] = useEstimationSequences();
@@ -16,18 +17,12 @@ export default function EstimationTest() {
     estimationResults.length === 0,
   );
   const [waitingNonModalInput, setWaitingNonModalInput] = useState(false);
-
   const [intervalTitle, setIntervalTitle] = useState('');
   const [limitReached, setLimitReached] = useState(false);
-  const beepSound = useRef<HTMLAudioElement>(new Audio(beepFile));
   const [isEditable, setEditable] = useState(false);
-
   const [modalOpen, setModalOpen] = useState(false);
-  const [userInput, setUserInput] = useState<number | null>(null);
 
-  const requestUserInput = async () => {
-    setModalOpen(true);
-  };
+  const beepSound = useRef<HTMLAudioElement>(new Audio(beepFile));
 
   // set interval title
   useEffect(() => {
@@ -38,13 +33,14 @@ export default function EstimationTest() {
       nextInterval = 9;
     } else setLimitReached(false);
 
-    const nextIntervalTime = estimationSequences[nextInterval - 1] / 1000;
     if (isTrialInterval)
       setIntervalTitle('Intervalo de Experimentação: 4 segundos');
-    else
+    else {
+      const nextIntervalTime = estimationSequences[nextInterval - 1] / 1000;
       setIntervalTitle(
         `Intervalo ${nextInterval}: ${nextIntervalTime} segundos`,
       );
+    }
   }, [estimationResults, estimationSequences, isTrialInterval]);
 
   // stopwatch
@@ -53,25 +49,25 @@ export default function EstimationTest() {
 
     if (isRunning) {
       const startTime = performance.now();
-      interval = setInterval(() => {
-        setTime(() => {
-          const currTime = performance.now() - startTime;
-          const limit = isTrialInterval
-            ? 4000
-            : estimationSequences[estimationResults.length];
+      const limit = isTrialInterval
+        ? 4000
+        : estimationSequences[estimationResults.length];
 
+      interval = setInterval(() => {
+        const currTime = performance.now() - startTime;
+        setTime(() => {
           if (currTime >= limit) {
-            clearInterval(interval);
             beepSound.current.play();
             setIsRunning(false);
-            if (!isTrialInterval) requestUserInput();
+            if (!isTrialInterval) setModalOpen(true);
             else setWaitingNonModalInput(true);
             return limit;
           }
           return currTime;
         });
       }, 1000);
-    }
+    } else clearInterval(interval);
+
     return () => {
       clearInterval(interval);
     };
@@ -99,18 +95,18 @@ export default function EstimationTest() {
     </button>
   );
 
-  const acceptTrialInterval = () => {
-    setTime(0);
-    setWaitingNonModalInput(false);
-    setIsTrialInterval(false);
-  };
-
   const cancelInterval = () => {
     setTime(0);
     setWaitingNonModalInput(false);
   };
 
-  // used when any interval is stopped before reaching the time limit or when trial interval finishes
+  const acceptTrialInterval = () => {
+    setIsTrialInterval(false);
+    cancelInterval();
+  };
+
+  // used when any interval is stopped before reaching the time limit
+  // or when trial interval finishes (waitingNonModalInput)
   const nonUserInputButtons = (
     <div>
       {isTrialInterval && (
@@ -135,17 +131,9 @@ export default function EstimationTest() {
     </div>
   );
 
-  const cancelUserInput = () => {
-    setModalOpen(false);
-    setUserInput(null);
-    setTime(0);
-  };
-
-  const saveUserInput = () => {
-    const input = userInput ?? 0;
+  const saveResult = (input: number) => {
     const newResults = [...estimationResults, input];
     setResults(newResults);
-    cancelUserInput();
   };
 
   return (
@@ -173,12 +161,11 @@ export default function EstimationTest() {
         setEditable={setEditable}
       />
 
-      <UserInputModal
+      <ResultInputModal
         isModalOpen={modalOpen}
-        userInput={userInput}
-        setUserInput={setUserInput}
-        saveUserInput={saveUserInput}
-        cancelUserInput={cancelUserInput}
+        setModalOpen={setModalOpen}
+        setTime={setTime}
+        saveResult={saveResult}
       />
     </div>
   );
