@@ -70,22 +70,22 @@ export default function MainMenu() {
           <div>{patientNameDiv}</div>
           <InstructionsModal
             buttonName="Descrição e regras iniciais"
-            instructionsString={`<p> Esta avaliação é composta por 4 testes com o propósito de avaliar a percepção temporal. </p>
+            instructionsString={`<p> Os Testes de Percepção Temporal são uma avaliação composta por 4 testes. </p>
                                 <p> O programa é utilizado somente pelo avaliador, não pelo participante. </p>
                                 <p> Regras para o participante: </p>
                                 <ul style="padding-left: 40px;">
-                                  <li> Não entrar em contacto com este programa e seus testes, antes e durante todo o processo de avaliação </li>
-                                  <li> Utilizar auriculares </li>
+                                  <li> Não entrar em contacto com este programa, antes e durante todo o processo de avaliação </li>
+                                  <li> Utilizar auriculares ligados a este computador </li>
                                   <li> Sentar numa cadeira confortável </li>
                                   <li> Estar numa sala vazia e silenciosa, sem nenhum som rítmico </li>
-                                  <li> Retirar todos os relógios da sala e do participante, se existirem </li>
+                                  <li> Retirar todos os relógios da sala e de si mesmo </li>
                                 </ul>`}
           />
         </div>
 
         <GlobalTest />
-        <TableTests title="Teste de Estimação" goToPath="/estimation-test" />
-        <TableTests title="Teste de Produção" goToPath="/production-test" />
+        <TableTests title="Teste de Estimação" />
+        <TableTests title="Teste de Produção" />
         <ClockTest />
       </div>
 

@@ -59,7 +59,7 @@ export default function ClockTest() {
                               <li> Fornecer lápis e papel ao participante </li>
                               <li> Começar cronómetro </li>
                               <li> Parar cronómetro assim que o participante acabar de desenhar o relógio </li>
-                              <li> Inserir tempo estimado pelo participante (depois de parar cronómetro, é providenciada uma janela para introduzir resultado) </li>
+                              <li> Inserir tempo estimado pelo participante (depois de parar cronómetro, aparece automaticamente uma janela para introduzir resultado) </li>
                             </ol>`}
       />
 

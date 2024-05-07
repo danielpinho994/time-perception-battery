@@ -11,7 +11,7 @@ import {
 import Table from '../common/Table';
 import InstructionsModal from '../common/InstructionsModal';
 
-export default function TableTests({ title, goToPath }) {
+export default function TableTests({ title }) {
   const navigate = useNavigate();
   const [globalModalOpen] = useGlobalModalOpen();
   const [isClockRunning] = useIsClockRunning();
@@ -21,7 +21,7 @@ export default function TableTests({ title, goToPath }) {
   <ul style="padding-left: 40px;">
     <li> Composto por 9 intervalos de tempo, mas o participante não pode saber quanto tempo tem cada intervalo. </li>
     <li> Cada sequência de 3 intervalos é composta por um intervalo de 7, 32 e 58 segundos, distribuídos aleatoriamente. </li>
-    <li> Ao começar cada intervalo é reproduzido um som de bipe. O intervalo termina automaticamente assim que atingir o limite, e é reproduzido o bipe novamente. </li>
+    <li> Ao começar cada intervalo é reproduzido um som de <i>beep</i>. O intervalo termina automaticamente assim que atingir o limite, e é reproduzido o <i>beep</i> novamente. </li>
     <li> O participante deve estimar quanto tempo passou. </li>
     <li> O participante pode fazer contagem interna, mas não pode usar a voz nem ritmos corporais. </li>
     <li> Antes de começar, existe um intervalo de experimentação de 4 segundos, para perceber se o participante entendeu as regras. </li>
@@ -38,7 +38,7 @@ export default function TableTests({ title, goToPath }) {
   <ul style="padding-left: 40px;">
     <li> Composto por 9 intervalos de tempo, e o participante tem de saber quanto tempo tem cada intervalo. </li>
     <li> Cada sequência de 3 intervalos é composta por um intervalo de 7, 32 e 58 segundos, distribuídos aleatoriamente. </li>
-    <li> Ao começar cada intervalo é reproduzido um som de bipe. O intervalo termina quando o participante estimar que tenha decorrido o tempo estipulado. </li>
+    <li> Ao começar cada intervalo é reproduzido um som de <i>beep</i>. O intervalo termina quando o participante estimar que tenha decorrido o tempo estipulado. </li>
     <li> O participante deve dizer "FIM" em voz alta, e o avaliador pára o cronómetro. </li>
     <li> O participante pode fazer contagem interna, mas não pode usar a voz nem ritmos corporais. </li>
     <li> Antes de começar, existe um intervalo de experimentação de 4 segundos, para perceber se o participante entendeu as regras. </li>
@@ -51,17 +51,19 @@ export default function TableTests({ title, goToPath }) {
     <li> Iniciar Teste de Produção </li>
   </ol>`;
 
-  const [[sequences], [results], instructions] =
+  const [[sequences], [results], instructions, goToPath] =
     title === 'Teste de Estimação'
       ? [
           useEstimationSequences(),
           useEstimationResults(),
           estimationInstructions,
+          '/estimation-test',
         ]
       : [
           useProductionSequences(),
           useProductionResults(),
           productionInstructions,
+          '/production-test',
         ];
 
   const goToTestButton = (

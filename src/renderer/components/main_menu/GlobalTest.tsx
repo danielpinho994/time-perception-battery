@@ -67,7 +67,7 @@ export default function GlobalTest() {
                               <li> Começar cronómetro </li>
                               <li> Completar restantes testes (estimação, produção e relógio) </li>
                               <li> Parar cronómetro </li>
-                              <li> Inserir tempo estimado pelo participante (depois de parar cronómetro, é providenciada uma janela para introduzir resultado) </li>
+                              <li> Inserir tempo estimado pelo participante (depois de parar cronómetro, aparece automaticamente uma janela para introduzir resultado) </li>
                             </ol>`}
       />
 

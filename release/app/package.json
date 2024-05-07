@@ -1,12 +1,11 @@
 {
-  "name": "electron-react-boilerplate",
+  "name": "testes-percepcao-temporal",
   "version": "1.0.0",
-  "description": "A foundation for scalable desktop apps",
-  "license": "MIT",
+  "description": "An app to evaluate time perception",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Daniel Tavares Pinho",
+    "email": "danielpinho994@gmail.com",
+    "url": "https://github.com/danielpinho994"
   },
   "main": "./dist/main/main.js",
   "scripts": {

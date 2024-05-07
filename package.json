@@ -1,5 +1,5 @@
 {
-  "description": "An app to help evaluate time perception on Parkinson's disease patients",
+  "description": "An app to evaluate time perception",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/danielpinho994"
@@ -148,8 +148,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "TestesDePercepçãoTemporal",
-    "appId": "org.dp.TimePerceptionBattery",
+    "productName": "Testes de Percepção Temporal",
+    "appId": "com.danielpinho994.TimePerceptionBattery",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -185,6 +185,10 @@
           "path": "/Applications"
         }
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     },
     "win": {
       "target": [
