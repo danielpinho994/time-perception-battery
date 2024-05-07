@@ -83,7 +83,7 @@
   color: white;
   width: 50%;
  }
- .input {
+ input {
   width: calc(100% - 20px); /* 100% width less the total horizontal padding */
   padding: 0.75rem;
   margin-bottom: 1rem;
@@ -91,6 +91,12 @@
   border-radius: 20px;
   text-align: center;
   font-size: 1.25rem;
+ }
+ .input-modal {
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  display: block;
+  max-width: 300px;
+  margin: 1rem auto;
  }
  table {
   width: 100%;
@@ -131,8 +137,8 @@
   border: 2px solid #ccc; /* subtle border added */
   }
  .final-result {
-  background-color: #ffecb3 !important;
- }
+   background-color: #ffecb3 !important;
+  }
   .modal {
   position: fixed; /* Make sure modal is in a fixed position */
   top: 50%;
@@ -145,19 +151,6 @@
   z-index: 1000;
   max-width: 500px;
   width: 90%;
-  font-size: 1.25rem;
- }
- .input-modal {
-  padding: 0.75rem 1.5rem;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  margin: 0.5rem;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  display: block;
-  width: 100%;
-  max-width: 300px;
-  margin: 1rem auto;
-  text-align: center;
   font-size: 1.25rem;
  }
  .modal-instructions {

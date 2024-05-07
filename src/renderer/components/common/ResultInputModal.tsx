@@ -24,7 +24,7 @@ export default function ResultInputModal({
     <div>
       {isModalOpen && (
         <div className="modal">
-          <h2 className="subtitle">Colocar resultado em {timeUnitString}</h2>
+          <h2>Colocar resultado em {timeUnitString}</h2>
           <input
             type="number"
             className="input-modal"

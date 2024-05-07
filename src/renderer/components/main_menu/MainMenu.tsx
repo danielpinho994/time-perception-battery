@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import {
   useIsClockRunning,
@@ -12,6 +12,7 @@ import GlobalTest from './GlobalTest';
 import ClockTest from './ClockTest';
 import TableTests from './TableTests';
 import InstructionsModal from '../common/InstructionsModal';
+import YesNoModal from '../common/YesNoModal';
 
 export default function MainMenu() {
   const [patientName, setPatientName] = usePatientName();
@@ -22,12 +23,12 @@ export default function MainMenu() {
   const { resetContext } = useAppContext();
 
   const printRef = useRef(null);
+  const [resetModal, setResetModal] = useState(false);
 
   const patientNameDiv = (
     <div>
-      <h2 className="subtitle">Nome do participante</h2>
+      <h2>Nome do participante</h2>
       <input
-        className="input"
         type="text"
         value={patientName}
         onChange={(e) => setPatientName(e.target.value)}
@@ -39,9 +40,7 @@ export default function MainMenu() {
   const printButton = (
     <button
       type="button"
-      onClick={useReactToPrint({
-        content: () => printRef.current,
-      })}
+      onClick={useReactToPrint({ content: () => printRef.current })}
       disabled={
         globalModalOpen || clockModalOpen || isClockRunning || isGlobalRunning
       }
@@ -53,7 +52,7 @@ export default function MainMenu() {
   const resetButton = (
     <button
       type="button"
-      onClick={resetContext}
+      onClick={() => setResetModal(true)}
       disabled={
         globalModalOpen || clockModalOpen || isClockRunning || isGlobalRunning
       }
@@ -66,7 +65,7 @@ export default function MainMenu() {
     <>
       <div ref={printRef} className="print-scale">
         <div className="level">
-          <h1 className="title">Testes de Percepção Temporal</h1>
+          <h1>Testes de Percepção Temporal</h1>
           <div>{patientNameDiv}</div>
           <InstructionsModal
             buttonName="Descrição e regras iniciais"
@@ -92,6 +91,12 @@ export default function MainMenu() {
       <h2 className="black-tab"> _ </h2>
       <div className="level">{printButton}</div>
       <div className="level">{resetButton}</div>
+      <YesNoModal
+        isModalOpen={resetModal}
+        setModal={setResetModal}
+        yesNoQuestion="Todos os dados serão perdidos. <p>Tem a certeza que deseja gerar novo teste?</p>"
+        handleYes={resetContext}
+      />
     </>
   );
 }
