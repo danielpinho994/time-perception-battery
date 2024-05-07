@@ -58,10 +58,17 @@ export default function GlobalTest() {
       <h2>Teste Global</h2>
 
       <InstructionsModal
-        instructionsString="No teste global pretende-se avaliar a percepção temporal a uma
-            escala mais ampla, ao medir o tempo total de duração do conjunto de
-            todos os testes. Antes de iniciar o teste, o paciente deve ser
-            avisado de que o teste irá começar."
+        buttonName="Instruções"
+        instructionsString={`<p> No teste global avalia-se o tempo total da avaliação. </p>
+                            <p> O participante não pode saber da existência deste teste. </p>
+                            <p> Passos: </p>
+                            <ol style="padding-left: 40px;">
+                              <li> Informar participante que a avaliação vai começar </li>
+                              <li> Começar cronómetro </li>
+                              <li> Completar restantes testes (estimação, produção e relógio) </li>
+                              <li> Parar cronómetro </li>
+                              <li> Inserir tempo estimado pelo participante (depois de parar cronómetro, é providenciada uma janela para introduzir resultado) </li>
+                            </ol>`}
       />
 
       <StopWatch

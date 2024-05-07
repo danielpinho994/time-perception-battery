@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 
-export default function InstructionsModal({ instructionsString }) {
+export default function InstructionsModal({ buttonName, instructionsString }) {
   const [instructions, setInstructions] = useState(false);
   const [modalStyle, setModalStyle] = useState<React.CSSProperties>({});
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -30,13 +30,16 @@ export default function InstructionsModal({ instructionsString }) {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        Instruções
+        {buttonName}
       </button>
 
       {instructions && (
-        <div className="modal-instructions" style={modalStyle}>
-          {instructionsString}
-        </div>
+        <div
+          className="modal-instructions"
+          style={modalStyle}
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: instructionsString }}
+        />
       )}
     </div>
   );
