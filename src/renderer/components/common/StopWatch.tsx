@@ -1,24 +1,4 @@
-import React from 'react';
-
-export default function StopWatch({
-  handleStartStop,
-  buttonDisabled,
-  isRunning,
-  isReset,
-  resetButtons,
-  time,
-}) {
-  const startStopButton = (
-    <button
-      type="button"
-      className="btn-start-stop"
-      onClick={handleStartStop}
-      disabled={buttonDisabled}
-    >
-      {isRunning ? 'Parar' : 'Começar'}
-    </button>
-  );
-
+export default function StopWatch({ startStopButton, time }) {
   const timer = (
     <div className="timer">
       <span className="digits">
@@ -32,7 +12,7 @@ export default function StopWatch({
 
   return (
     <>
-      <div>{isReset ? resetButtons : startStopButton}</div>
+      <div>{startStopButton}</div>
       <div>{timer}</div>
     </>
   );

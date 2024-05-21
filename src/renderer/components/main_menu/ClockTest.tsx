@@ -46,6 +46,17 @@ export default function ClockTest() {
     setResults([time === 0 ? clockResults[0] : time, input]);
   };
 
+  const startStopButton = (
+    <button
+      type="button"
+      className="btn-start-stop"
+      onClick={handleStartStop}
+      disabled={globalModalOpen || clockModalOpen}
+    >
+      {isClockRunning ? 'Parar' : 'Começar'}
+    </button>
+  );
+
   return (
     <div className="level">
       <h2>Teste do Relógio </h2>
@@ -63,14 +74,7 @@ export default function ClockTest() {
                             </ol>`}
       />
 
-      <StopWatch
-        handleStartStop={handleStartStop}
-        buttonDisabled={globalModalOpen || clockModalOpen}
-        isRunning={isClockRunning}
-        isReset={false}
-        resetButtons={null}
-        time={time}
-      />
+      <StopWatch startStopButton={startStopButton} time={time} />
 
       <SingleClockResults
         results={clockResults}

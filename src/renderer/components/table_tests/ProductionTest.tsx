@@ -9,7 +9,10 @@ export default function ProductionTest() {
   const [productionSequences] = useProductionSequences();
   const [productionResults, setResults] = useProductionResults();
 
-  const [waitingTimerReset, setWaitingTimerReset] = useState(false);
+  const [isReset, setIsReset] = useState(false);
+  const [isResultsFull, setisResultsFull] = useState(
+    productionResults.length === 9,
+  );
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
   const [isEditable, setEditable] = useState(false);
@@ -17,7 +20,6 @@ export default function ProductionTest() {
     productionResults.length === 0,
   );
   const [intervalTitle, setIntervalTitle] = useState('');
-  const [limitReached, setLimitReached] = useState(false);
   const beepSound = useRef<HTMLAudioElement>(new Audio(beepFile));
 
   // set interval title
@@ -25,9 +27,9 @@ export default function ProductionTest() {
     let nextInterval = productionResults.length + 1;
 
     if (nextInterval === 10) {
-      setLimitReached(true);
+      setisResultsFull(true);
       nextInterval = 9;
-    } else setLimitReached(false);
+    }
 
     if (isTrialInterval)
       setIntervalTitle('Intervalo de Experimentação: 4 segundos');
@@ -55,14 +57,32 @@ export default function ProductionTest() {
   }, [isRunning]);
 
   const handleStartStop = () => {
-    beepSound.current.play();
-    if (isRunning) setWaitingTimerReset(true);
+    if (!isRunning)
+      beepSound.current.play(); // playing sound should have top priority
+    else setIsReset(true);
     setIsRunning(!isRunning);
   };
 
+  const startStopButton = (
+    <button
+      type="button"
+      className="btn-start-stop"
+      onClick={handleStartStop}
+      disabled={isEditable}
+    >
+      {isRunning ? 'Parar' : 'Começar'}
+    </button>
+  );
+
   const handleReset = () => {
     setTime(0);
-    setWaitingTimerReset(false);
+    if (productionResults.length === 9) {
+      const newResults = productionResults;
+      newResults.pop();
+      setResults(newResults);
+      if (newResults.length !== 9) setisResultsFull(false);
+    }
+    setIsReset(false);
   };
 
   const handleSave = () => {
@@ -71,8 +91,9 @@ export default function ProductionTest() {
     else {
       const newResults = [...productionResults, Math.floor(time / 1000)];
       setResults(newResults);
+      if (newResults.length !== 9) setisResultsFull(false);
     }
-    setWaitingTimerReset(false);
+    setIsReset(false);
   };
 
   const resetButtons = (
@@ -81,9 +102,11 @@ export default function ProductionTest() {
         type="button"
         className="btn-submit"
         onClick={handleSave}
-        disabled={isEditable}
+        disabled={isResultsFull || isEditable}
       >
-        {isTrialInterval ? 'Próximo intervalo' : 'Guardar intervalo'}
+        {isTrialInterval || isResultsFull
+          ? 'Próximo intervalo'
+          : 'Guardar intervalo'}
       </button>
 
       <button
@@ -103,11 +126,9 @@ export default function ProductionTest() {
       <h2>{intervalTitle}</h2>
 
       <StopWatch
-        handleStartStop={handleStartStop}
-        buttonDisabled={limitReached || isEditable}
-        isRunning={isRunning}
-        isReset={waitingTimerReset}
-        resetButtons={resetButtons}
+        startStopButton={
+          isReset || isResultsFull ? resetButtons : startStopButton
+        }
         time={time}
       />
 
@@ -118,9 +139,9 @@ export default function ProductionTest() {
         isEditable={isEditable}
       />
 
-      <MainMenuButton disabled={isRunning || isEditable || waitingTimerReset} />
+      <MainMenuButton disabled={isRunning || isEditable || isReset} />
       <EditResultsButton
-        disabled={isRunning || waitingTimerReset}
+        disabled={isRunning || isReset}
         isEditable={isEditable}
         results={productionResults}
         setResults={setResults}

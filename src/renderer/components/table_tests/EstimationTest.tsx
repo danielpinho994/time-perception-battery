@@ -16,9 +16,8 @@ export default function EstimationTest() {
   const [isTrialInterval, setIsTrialInterval] = useState(
     estimationResults.length === 0,
   );
-  const [waitingNonModalInput, setWaitingNonModalInput] = useState(false);
+  const [isReset, setIsReset] = useState(false);
   const [intervalTitle, setIntervalTitle] = useState('');
-  const [limitReached, setLimitReached] = useState(false);
   const [isEditable, setEditable] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -29,9 +28,9 @@ export default function EstimationTest() {
     let nextInterval = estimationResults.length + 1;
 
     if (nextInterval === 10) {
-      setLimitReached(true);
+      setIsReset(true);
       nextInterval = 9;
-    } else setLimitReached(false);
+    }
 
     if (isTrialInterval)
       setIntervalTitle('Intervalo de Experimentação: 4 segundos');
@@ -60,7 +59,7 @@ export default function EstimationTest() {
             beepSound.current.play();
             setIsRunning(false);
             if (!isTrialInterval) setModalOpen(true);
-            else setWaitingNonModalInput(true);
+            else setIsReset(true);
             return limit;
           }
           return currTime;
@@ -80,13 +79,24 @@ export default function EstimationTest() {
 
   const handleStartStop = () => {
     beepSound.current.play();
-    if (isRunning) setWaitingNonModalInput(true);
+    if (isRunning) setIsReset(true);
     setIsRunning(!isRunning);
   };
 
+  const startStopButton = (
+    <button
+      type="button"
+      className="btn-start-stop"
+      onClick={handleStartStop}
+      disabled={modalOpen || isEditable}
+    >
+      {isRunning ? 'Parar' : 'Começar'}
+    </button>
+  );
+
   const cancelInterval = () => {
     setTime(0);
-    setWaitingNonModalInput(false);
+    setIsReset(false);
   };
 
   const acceptTrialInterval = () => {
@@ -96,7 +106,7 @@ export default function EstimationTest() {
 
   // used when any interval is stopped before reaching the time limit
   // or when trial interval finishes (waitingNonModalInput)
-  const nonUserInputButtons = (
+  const resetButtons = (
     <div>
       {isTrialInterval && (
         <button
@@ -130,11 +140,7 @@ export default function EstimationTest() {
       <h1>Teste de Estimação</h1>
       <h2>{intervalTitle}</h2>
       <StopWatch
-        handleStartStop={handleStartStop}
-        buttonDisabled={limitReached || modalOpen || isEditable}
-        isRunning={isRunning}
-        isReset={waitingNonModalInput}
-        resetButtons={nonUserInputButtons}
+        startStopButton={isReset ? resetButtons : startStopButton}
         time={time}
       />
 
@@ -146,10 +152,10 @@ export default function EstimationTest() {
       />
 
       <MainMenuButton
-        disabled={isRunning || isEditable || modalOpen || waitingNonModalInput}
+        disabled={isRunning || isEditable || modalOpen || isReset}
       />
       <EditResultsButton
-        disabled={isRunning || modalOpen || waitingNonModalInput}
+        disabled={isRunning || modalOpen || isReset}
         isEditable={isEditable}
         results={estimationResults}
         setResults={setResults}
