@@ -17,6 +17,9 @@ export default function EstimationTest() {
     estimationResults.length === 0,
   );
   const [isReset, setIsReset] = useState(false);
+  const [isResultsFull, setisResultsFull] = useState(
+    estimationResults.length === 9,
+  );
   const [intervalTitle, setIntervalTitle] = useState('');
   const [isEditable, setEditable] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,7 +31,7 @@ export default function EstimationTest() {
     let nextInterval = estimationResults.length + 1;
 
     if (nextInterval === 10) {
-      setIsReset(true);
+      setisResultsFull(true);
       nextInterval = 9;
     }
 
@@ -97,6 +100,12 @@ export default function EstimationTest() {
   const cancelInterval = () => {
     setTime(0);
     setIsReset(false);
+    setisResultsFull(false);
+    if (estimationResults.length === 9) {
+      const newResults = estimationResults;
+      newResults.pop();
+      setResults(newResults);
+    }
   };
 
   const acceptTrialInterval = () => {
@@ -125,7 +134,7 @@ export default function EstimationTest() {
         onClick={cancelInterval}
         disabled={isEditable}
       >
-        Cancelar Intervalo
+        {isResultsFull ? 'Apagar Intervalo' : 'Cancelar Intervalo'}
       </button>
     </div>
   );
@@ -140,7 +149,9 @@ export default function EstimationTest() {
       <h1>Teste de Estimação</h1>
       <h2>{intervalTitle}</h2>
       <StopWatch
-        startStopButton={isReset ? resetButtons : startStopButton}
+        startStopButton={
+          isReset || isResultsFull ? resetButtons : startStopButton
+        }
         time={time}
       />
 
