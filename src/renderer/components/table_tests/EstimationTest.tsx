@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useEstimationSequences, useEstimationResults } from '../AppContext';
 import beepFile from '../../../../assets/beep.wav';
 import StopWatch from '../common/StopWatch';
-import Table from '../common/Table';
 import ResultInputModal from '../common/ResultInputModal';
-import { MainMenuButton, EditResultsButton } from '../common/CommonButtons';
+import MainMenuButton from '../common/CommonButtons';
+import EditableTable from '../common/Table';
 
 export default function EstimationTest() {
   const [estimationSequences] = useEstimationSequences();
@@ -155,22 +155,17 @@ export default function EstimationTest() {
         time={time}
       />
 
-      <Table
+      <EditableTable
         sequences={estimationSequences}
         results={estimationResults}
         setResults={setResults}
         isEditable={isEditable}
+        setEditable={setEditable}
+        editButtonDisabled={isRunning || modalOpen || isReset}
       />
 
       <MainMenuButton
         disabled={isRunning || isEditable || modalOpen || isReset}
-      />
-      <EditResultsButton
-        disabled={isRunning || modalOpen || isReset}
-        isEditable={isEditable}
-        results={estimationResults}
-        setResults={setResults}
-        setEditable={setEditable}
       />
 
       <ResultInputModal

@@ -8,7 +8,7 @@ import {
   useClockModalOpen,
   useGlobalModalOpen,
 } from '../AppContext';
-import Table from '../common/Table';
+import { MainMenuTable } from '../common/Table';
 import InstructionsModal from '../common/InstructionsModal';
 
 export default function TableTests({ title }) {
@@ -87,12 +87,7 @@ export default function TableTests({ title }) {
 
       <div>{goToTestButton}</div>
 
-      <Table
-        sequences={sequences}
-        results={results}
-        setResults={null}
-        isEditable={false}
-      />
+      <MainMenuTable sequences={sequences} results={results} />
     </div>
   );
 }

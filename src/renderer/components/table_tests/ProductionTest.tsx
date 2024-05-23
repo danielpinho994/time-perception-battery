@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import beepFile from '../../../../assets/beep.wav';
 import StopWatch from '../common/StopWatch';
 import { useProductionResults, useProductionSequences } from '../AppContext';
-import Table from '../common/Table';
-import { MainMenuButton, EditResultsButton } from '../common/CommonButtons';
+import MainMenuButton from '../common/CommonButtons';
+import EditableTable from '../common/Table';
 
 export default function ProductionTest() {
   const [productionSequences] = useProductionSequences();
@@ -132,21 +132,16 @@ export default function ProductionTest() {
         time={time}
       />
 
-      <Table
+      <EditableTable
         sequences={productionSequences}
         results={productionResults}
         setResults={setResults}
         isEditable={isEditable}
+        setEditable={setEditable}
+        editButtonDisabled={isRunning || isReset}
       />
 
       <MainMenuButton disabled={isRunning || isEditable || isReset} />
-      <EditResultsButton
-        disabled={isRunning || isReset}
-        isEditable={isEditable}
-        results={productionResults}
-        setResults={setResults}
-        setEditable={setEditable}
-      />
     </div>
   );
 }
