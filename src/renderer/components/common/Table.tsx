@@ -17,7 +17,8 @@ export default function EditableTable({
   ) => {
     const value = event.currentTarget.textContent;
     const parsedValue = value ? parseInt(value, 10) : 0;
-    editingValues.current[index] = Number.isNaN(parsedValue) ? 0 : parsedValue;
+    editingValues.current[index] =
+      Number.isNaN(parsedValue) || parsedValue < 0 ? 0 : parsedValue;
   };
 
   const toggleEditable = () => {
@@ -28,6 +29,7 @@ export default function EditableTable({
         newResults.pop();
       }
       setResults(newResults);
+      editingValues.current = newResults;
     }
     setEditable(!isEditable);
   };

@@ -35,6 +35,8 @@ export default function EstimationTest() {
       nextInterval = 9;
     }
 
+    if (estimationResults.length !== 0) setIsTrialInterval(false);
+
     if (isTrialInterval)
       setIntervalTitle('Intervalo de Experimentação: 4 segundos');
     else {

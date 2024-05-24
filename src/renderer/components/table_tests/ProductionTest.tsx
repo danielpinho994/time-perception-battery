@@ -31,6 +31,8 @@ export default function ProductionTest() {
       nextInterval = 9;
     }
 
+    if (productionResults.length !== 0) setIsTrialInterval(false);
+
     if (isTrialInterval)
       setIntervalTitle('Intervalo de Experimentação: 4 segundos');
     else {
