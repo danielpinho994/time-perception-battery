@@ -27,6 +27,7 @@ export default function ResultInputModal({
           <h2>Colocar resultado em {timeUnitString}</h2>
           <input
             type="number"
+            min="0"
             className="input-modal"
             value={userInput ?? undefined}
             onChange={(e) => setUserInput(Number(e.target.value))}

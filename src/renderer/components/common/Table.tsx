@@ -15,10 +15,16 @@ export default function EditableTable({
     index: number,
     event: FormEvent<HTMLTableCellElement>,
   ) => {
-    const value = event.currentTarget.textContent;
-    const parsedValue = value ? parseInt(value, 10) : 0;
-    editingValues.current[index] =
-      Number.isNaN(parsedValue) || parsedValue < 0 ? 0 : parsedValue;
+    let value = event.currentTarget.textContent;
+    if (value) {
+      // allow only numbers
+      value = value.replace(/[^0-9]/g, '');
+      event.currentTarget.textContent = value;
+
+      editingValues.current[index] = parseInt(value, 10);
+    } else {
+      editingValues.current[index] = 0;
+    }
   };
 
   const toggleEditable = () => {
