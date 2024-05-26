@@ -3,6 +3,11 @@ export default function SingleClockResults({
   timeUnitString,
   setModalOpen,
   editButtonDisabled,
+}: {
+  results: [number, number];
+  timeUnitString: string;
+  setModalOpen: (isModal: boolean) => void;
+  editButtonDisabled: boolean;
 }) {
   const timer =
     results[0] === 0

@@ -6,6 +6,12 @@ export default function ResultInputModal({
   setTime,
   saveResult,
   timeUnitString,
+}: {
+  isModalOpen: boolean;
+  setModalOpen: (isOpen: boolean) => void;
+  setTime: (time: number) => void;
+  saveResult: (result: number) => void;
+  timeUnitString: string;
 }) {
   const [userInput, setUserInput] = useState<number | null>(null);
 

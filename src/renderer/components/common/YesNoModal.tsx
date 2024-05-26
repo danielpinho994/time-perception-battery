@@ -3,6 +3,11 @@ export default function YesNoModal({
   setModal,
   yesNoQuestion,
   handleYes,
+}: {
+  isModalOpen: boolean;
+  setModal: (isModal: boolean) => void;
+  yesNoQuestion: string;
+  handleYes: () => void;
 }) {
   const clickYes = () => {
     handleYes();

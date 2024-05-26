@@ -4,7 +4,7 @@ import { useEstimationSequences, useEstimationResults } from '../AppContext';
 import beepFile from '../../../../assets/beep.wav';
 import StopWatch from '../common/StopWatch';
 import ResultInputModal from '../common/ResultInputModal';
-import MainMenuButton from '../common/CommonButtons';
+import MainMenuButton from './MainMenuButton';
 import EditableTable from '../common/Table';
 
 export default function EstimationTest() {

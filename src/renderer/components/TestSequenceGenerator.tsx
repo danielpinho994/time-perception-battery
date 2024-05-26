@@ -2,7 +2,7 @@
 const intervals = [7000, 32000, 58000];
 const sequencesNumber = 3;
 
-function shuffleArray(arr) {
+function shuffleArray(arr: number[]) {
   const shuffledArray = arr.slice();
   for (let i = shuffledArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

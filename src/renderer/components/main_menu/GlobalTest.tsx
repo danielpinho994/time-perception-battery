@@ -53,6 +53,17 @@ export default function GlobalTest() {
     setResults([time === 0 ? globalResults[0] : time, input]);
   };
 
+  const startStopButton = (
+    <button
+      type="button"
+      className="btn-start-stop"
+      onClick={handleStartStop}
+      disabled={globalModalOpen || clockModalOpen || isClockRunning}
+    >
+      {isGlobalRunning ? 'Parar' : 'Começar'}
+    </button>
+  );
+
   return (
     <div className="level">
       <h2>Teste Global</h2>
@@ -71,14 +82,8 @@ export default function GlobalTest() {
                             </ol>`}
       />
 
-      <StopWatch
-        handleStartStop={handleStartStop}
-        buttonDisabled={globalModalOpen || clockModalOpen || isClockRunning}
-        isRunning={isGlobalRunning}
-        isReset={false}
-        resetButtons={null}
-        time={time}
-      />
+      <StopWatch startStopButton={startStopButton} time={time} />
+
       <SingleClockResults
         results={globalResults}
         timeUnitString="minutos"

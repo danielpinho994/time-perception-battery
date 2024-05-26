@@ -8,6 +8,13 @@ export default function EditableTable({
   isEditable,
   setEditable,
   editButtonDisabled,
+}: {
+  sequences: number[];
+  results: number[];
+  setResults: (results: number[]) => void;
+  isEditable: boolean;
+  setEditable: (isEditable: boolean) => void;
+  editButtonDisabled: boolean;
 }) {
   const editingValues = useRef<number[]>([...results]);
 
@@ -89,7 +96,13 @@ export default function EditableTable({
   );
 }
 
-export function MainMenuTable({ sequences, results }) {
+export function MainMenuTable({
+  sequences,
+  results,
+}: {
+  sequences: number[];
+  results: number[];
+}) {
   return (
     <table>
       <tr>

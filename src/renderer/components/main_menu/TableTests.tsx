@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { useNavigate } from 'react-router-dom';
 import {
   useEstimationSequences,
@@ -11,7 +12,7 @@ import {
 import { MainMenuTable } from '../common/Table';
 import InstructionsModal from '../common/InstructionsModal';
 
-export default function TableTests({ title }) {
+export default function TableTests({ title }: { title: string }) {
   const navigate = useNavigate();
   const [globalModalOpen] = useGlobalModalOpen();
   const [isClockRunning] = useIsClockRunning();

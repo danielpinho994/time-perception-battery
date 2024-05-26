@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import beepFile from '../../../../assets/beep.wav';
 import StopWatch from '../common/StopWatch';
 import { useProductionResults, useProductionSequences } from '../AppContext';
-import MainMenuButton from '../common/CommonButtons';
+import MainMenuButton from './MainMenuButton';
 import EditableTable from '../common/Table';
 
 export default function ProductionTest() {

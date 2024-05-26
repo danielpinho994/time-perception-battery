@@ -1,6 +1,12 @@
 import React, { useState, useRef } from 'react';
 
-export default function InstructionsModal({ buttonName, instructionsString }) {
+export default function InstructionsModal({
+  buttonName,
+  instructionsString,
+}: {
+  buttonName: string;
+  instructionsString: string;
+}) {
   const [instructions, setInstructions] = useState(false);
   const [modalStyle, setModalStyle] = useState<React.CSSProperties>({});
   const buttonRef = useRef<HTMLButtonElement>(null);

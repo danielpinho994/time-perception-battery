@@ -1,4 +1,12 @@
-export default function StopWatch({ startStopButton, time }) {
+import React from 'react';
+
+export default function StopWatch({
+  startStopButton,
+  time,
+}: {
+  startStopButton: React.ReactNode;
+  time: number;
+}) {
   const timer = (
     <div className="timer">
       <span className="digits">
