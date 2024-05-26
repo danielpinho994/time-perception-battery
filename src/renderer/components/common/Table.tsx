@@ -35,13 +35,14 @@ export default function EditableTable({
   };
 
   const toggleEditable = () => {
-    if (isEditable) {
+    if (!isEditable) editingValues.current = [...results];
+    else {
       // Remove trailing zero values
       const newResults = [...results];
       while (newResults.length > 0 && newResults[newResults.length - 1] === 0) {
         newResults.pop();
       }
-      setResults(newResults);
+      setResults([...newResults]);
       editingValues.current = newResults;
     }
     setEditable(!isEditable);
